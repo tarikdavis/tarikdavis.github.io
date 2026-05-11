@@ -228,10 +228,82 @@
   .shop-card-head { background: var(--charcoal); color: var(--cream); padding: 14px 18px; }
   .shop-cat { font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gold); font-weight: 500; }
   .shop-list { list-style: none; padding: 14px 18px; }
-  .shop-list li { font-size: 13px; padding: 6px 0; border-bottom: 1px solid var(--border); display: flex; align-items: baseline; gap: 8px; }
+  .shop-list li { font-size: 13px; border-bottom: 1px solid var(--border); }
   .shop-list li:last-child { border-bottom: none; }
-  .shop-list li::before { content: '—'; color: var(--terracotta); font-size: 12px; flex-shrink: 0; }
   .shop-amount { color: var(--muted); font-size: 12px; margin-left: auto; white-space: nowrap; }
+
+  /* CHECKABLE SHOPPING ITEMS */
+  .shop-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    padding: 8px 0;
+    min-height: 36px;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .shop-check {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 22px;
+    height: 22px;
+    border: 2px solid var(--terracotta);
+    border-radius: 5px;
+    background: transparent;
+    cursor: pointer;
+    flex-shrink: 0;
+    position: relative;
+    transition: background 0.15s, border-color 0.15s;
+    margin: 0;
+  }
+  .shop-check:hover { border-color: var(--brown); }
+  .shop-check:checked { background: var(--terracotta); border-color: var(--terracotta); }
+  .shop-check:checked::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 6px;
+    width: 5px;
+    height: 11px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+  .shop-check:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+  .shop-name { flex: 1; color: var(--charcoal); transition: color 0.15s, text-decoration 0.15s; }
+  .shop-item:has(.shop-check:checked) .shop-name {
+    text-decoration: line-through;
+    color: var(--muted);
+  }
+  .shop-item:has(.shop-check:checked) .shop-amount { opacity: 0.45; }
+
+  /* Reset button — sits next to existing print button */
+  .reset-btn {
+    display: inline-block;
+    margin-bottom: 28px;
+    margin-left: 8px;
+    background: transparent;
+    color: var(--terracotta);
+    border: 1px solid var(--terracotta);
+    padding: 10px 22px;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    letter-spacing: 0.03em;
+    transition: all 0.15s;
+  }
+  .reset-btn:hover { background: var(--terracotta); color: white; }
+
+  /* Mobile: bigger tap targets per Apple HIG (44pt minimum) */
+  @media (max-width: 700px) {
+    .shop-item { min-height: 44px; gap: 14px; }
+    .shop-check { width: 26px; height: 26px; }
+    .shop-check:checked::after { top: 3px; left: 8px; width: 6px; height: 12px; }
+    .shop-list { padding: 14px 16px; }
+  }
 
   .print-btn {
     display: inline-block;
@@ -415,12 +487,17 @@
     body[data-printing] .section,
     body[data-printing] .tool-btn,
     body[data-printing] .print-btn,
+    body[data-printing] .reset-btn,
     body[data-printing] .mode-toggle { display: none !important; }
     body[data-printing="shopping-muscle"] #shopping-muscle,
     body[data-printing="lift-log"] #lift-log,
     body[data-printing="shopping"] #shopping { display: block !important; }
     body[data-printing] main { padding: 0 !important; }
     body[data-printing] .section-title { margin-top: 0; }
+    /* Hide checkboxes on paper; hide already-checked items entirely so the
+       printed list shows only what's still needed. */
+    body[data-printing] .shop-check { display: none !important; }
+    body[data-printing] .shop-list li:has(.shop-check:checked) { display: none !important; }
     @page { margin: 12mm; }
   }
 
@@ -444,7 +521,7 @@
   }
 </style>
 </head>
-<body>
+<body data-week="2026-05-11">
 
 <div class="hero">
   <div class="hero-inner">
@@ -895,85 +972,386 @@
   <div class="section-title">Shopping List</div>
   <div class="section-sub">Everything you need for the week. Quantities for 1 person, 7 days, 21 meals.</div>
   <button class="print-btn" onclick="printFocused('shopping')">Print shopping list</button>
+  <button class="reset-btn" onclick="resetShopChecks('shopping')">Reset checks</button>
   <div class="shop-grid">
     <div class="shop-card">
       <div class="shop-card-head"><div class="shop-cat">Eggs & Dairy</div></div>
       <ul class="shop-list">
-        <li>Free range large eggs <span class="shop-amount">18</span></li>
-        <li>Greek yoghurt <span class="shop-amount">500g</span></li>
-        <li>Cottage cheese (reduced fat) <span class="shop-amount">300g</span></li>
-        <li>Halloumi <span class="shop-amount">250g</span></li>
-        <li>Kefir drink <span class="shop-amount">500ml</span></li>
-        <li>Salted butter <span class="shop-amount">250g</span></li>
-        <li>Whole milk <span class="shop-amount">500ml</span></li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping">
+            <span class="shop-name">Free range large eggs</span>
+            <span class="shop-amount">18</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping">
+            <span class="shop-name">Greek yoghurt</span>
+            <span class="shop-amount">500g</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping">
+            <span class="shop-name">Cottage cheese (reduced fat)</span>
+            <span class="shop-amount">300g</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping">
+            <span class="shop-name">Halloumi</span>
+            <span class="shop-amount">250g</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping">
+            <span class="shop-name">Kefir drink</span>
+            <span class="shop-amount">500ml</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping">
+            <span class="shop-name">Salted butter</span>
+            <span class="shop-amount">250g</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping">
+            <span class="shop-name">Whole milk</span>
+            <span class="shop-amount">500ml</span>
+          </label>
+        </li>
       </ul>
     </div>
     <div class="shop-card">
       <div class="shop-card-head"><div class="shop-cat">Veggie Protein</div></div>
       <ul class="shop-list">
-        <li>Quorn vegetarian mince <span class="shop-amount">2 × 500g</span></li>
-        <li>Firm tofu <span class="shop-amount">400g</span></li>
-        <li>Vegetarian Kyiv <span class="shop-amount">310g pack</span></li>
-        <li>Beetroot & kale burgers <span class="shop-amount">220g</span></li>
-        <li>Cannellini beans (tin) <span class="shop-amount">2 × 400g</span></li>
-        <li>Black beans (tin) <span class="shop-amount">2 × 400g</span></li>
-        <li>Chickpeas (tin) <span class="shop-amount">2 × 400g</span></li>
-        <li>Green/brown lentils (tin) <span class="shop-amount">2 × 400g</span></li>
-        <li>Baked beans (tin) <span class="shop-amount">2 × 400g</span></li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping">
+            <span class="shop-name">Quorn vegetarian mince</span>
+            <span class="shop-amount">2 × 500g</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping">
+            <span class="shop-name">Firm tofu</span>
+            <span class="shop-amount">400g</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping">
+            <span class="shop-name">Vegetarian Kyiv</span>
+            <span class="shop-amount">310g pack</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping">
+            <span class="shop-name">Beetroot & kale burgers</span>
+            <span class="shop-amount">220g</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping">
+            <span class="shop-name">Cannellini beans (tin)</span>
+            <span class="shop-amount">2 × 400g</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping">
+            <span class="shop-name">Black beans (tin)</span>
+            <span class="shop-amount">2 × 400g</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping">
+            <span class="shop-name">Chickpeas (tin)</span>
+            <span class="shop-amount">2 × 400g</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping">
+            <span class="shop-name">Green/brown lentils (tin)</span>
+            <span class="shop-amount">2 × 400g</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping">
+            <span class="shop-name">Baked beans (tin)</span>
+            <span class="shop-amount">2 × 400g</span>
+          </label>
+        </li>
       </ul>
     </div>
     <div class="shop-card">
       <div class="shop-card-head"><div class="shop-cat">Fresh Veg</div></div>
       <ul class="shop-list">
-        <li>Baby chestnut mushrooms <span class="shop-amount">300g</span></li>
-        <li>Mixed peppers <span class="shop-amount">4-pack</span></li>
-        <li>Vine tomatoes <span class="shop-amount">450g</span></li>
-        <li>Avocados <span class="shop-amount">3</span></li>
-        <li>Sweet potatoes <span class="shop-amount">3 medium</span></li>
-        <li>Salad onions <span class="shop-amount">1 bunch</span></li>
-        <li>Brown onions <span class="shop-amount">3-pack</span></li>
-        <li>Cucumber <span class="shop-amount">1</span></li>
-        <li>Babyleaf salad <span class="shop-amount">90g</span></li>
-        <li>Cooked beetroot <span class="shop-amount">250g</span></li>
-        <li>Chives <span class="shop-amount">25g</span></li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping">
+            <span class="shop-name">Baby chestnut mushrooms</span>
+            <span class="shop-amount">300g</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping">
+            <span class="shop-name">Mixed peppers</span>
+            <span class="shop-amount">4-pack</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping">
+            <span class="shop-name">Vine tomatoes</span>
+            <span class="shop-amount">450g</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping">
+            <span class="shop-name">Avocados</span>
+            <span class="shop-amount">3</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping">
+            <span class="shop-name">Sweet potatoes</span>
+            <span class="shop-amount">3 medium</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping">
+            <span class="shop-name">Salad onions</span>
+            <span class="shop-amount">1 bunch</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping">
+            <span class="shop-name">Brown onions</span>
+            <span class="shop-amount">3-pack</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping">
+            <span class="shop-name">Cucumber</span>
+            <span class="shop-amount">1</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping">
+            <span class="shop-name">Babyleaf salad</span>
+            <span class="shop-amount">90g</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping">
+            <span class="shop-name">Cooked beetroot</span>
+            <span class="shop-amount">250g</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping">
+            <span class="shop-name">Chives</span>
+            <span class="shop-amount">25g</span>
+          </label>
+        </li>
       </ul>
     </div>
     <div class="shop-card">
       <div class="shop-card-head"><div class="shop-cat">Frozen</div></div>
       <ul class="shop-list">
-        <li>Petits pois <span class="shop-amount">910g</span></li>
-        <li>Supersweet sweetcorn <span class="shop-amount">1kg</span></li>
-        <li>Mixed summer fruits <span class="shop-amount">500g</span></li>
-        <li>Blueberries <span class="shop-amount">350g</span></li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping">
+            <span class="shop-name">Petits pois</span>
+            <span class="shop-amount">910g</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping">
+            <span class="shop-name">Supersweet sweetcorn</span>
+            <span class="shop-amount">1kg</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping">
+            <span class="shop-name">Mixed summer fruits</span>
+            <span class="shop-amount">500g</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping">
+            <span class="shop-name">Blueberries</span>
+            <span class="shop-amount">350g</span>
+          </label>
+        </li>
       </ul>
     </div>
     <div class="shop-card">
       <div class="shop-card-head"><div class="shop-cat">Cupboard</div></div>
       <ul class="shop-list">
-        <li>Chopped tomatoes (tin) <span class="shop-amount">4 × 400g</span></li>
-        <li>Tomato passata <span class="shop-amount">500g</span></li>
-        <li>Tomato purée <span class="shop-amount">140g</span></li>
-        <li>Fusilli pasta <span class="shop-amount">500g</span></li>
-        <li>Brown rice <span class="shop-amount">500g</span></li>
-        <li>Rolled oats <span class="shop-amount">500g</span></li>
-        <li>Rye crispbread <span class="shop-amount">1 pack</span></li>
-        <li>Wholegrain bread <span class="shop-amount">1 loaf</span></li>
-        <li>Low-carb tortilla wraps <span class="shop-amount">1 pack</span></li>
-        <li>Garlic <span class="shop-amount">1 bulb</span></li>
-        <li>Reduced-salt soy sauce <span class="shop-amount">150ml</span></li>
-        <li>Vegetable stock cubes <span class="shop-amount">1 pack</span></li>
-        <li>Unsweetened almond milk <span class="shop-amount">1L</span></li>
-        <li>Lentil chips (salted) <span class="shop-amount">95g</span></li>
-        <li>Haimisha gherkins <span class="shop-amount">670g jar</span></li>
-        <li>Chia seeds <span class="shop-amount">small pack</span></li>
-        <li>Mixed seeds <span class="shop-amount">small pack</span></li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping">
+            <span class="shop-name">Chopped tomatoes (tin)</span>
+            <span class="shop-amount">4 × 400g</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping">
+            <span class="shop-name">Tomato passata</span>
+            <span class="shop-amount">500g</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping">
+            <span class="shop-name">Tomato purée</span>
+            <span class="shop-amount">140g</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping">
+            <span class="shop-name">Fusilli pasta</span>
+            <span class="shop-amount">500g</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping">
+            <span class="shop-name">Brown rice</span>
+            <span class="shop-amount">500g</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping">
+            <span class="shop-name">Rolled oats</span>
+            <span class="shop-amount">500g</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping">
+            <span class="shop-name">Rye crispbread</span>
+            <span class="shop-amount">1 pack</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping">
+            <span class="shop-name">Wholegrain bread</span>
+            <span class="shop-amount">1 loaf</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping">
+            <span class="shop-name">Low-carb tortilla wraps</span>
+            <span class="shop-amount">1 pack</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping">
+            <span class="shop-name">Garlic</span>
+            <span class="shop-amount">1 bulb</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping">
+            <span class="shop-name">Reduced-salt soy sauce</span>
+            <span class="shop-amount">150ml</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping">
+            <span class="shop-name">Vegetable stock cubes</span>
+            <span class="shop-amount">1 pack</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping">
+            <span class="shop-name">Unsweetened almond milk</span>
+            <span class="shop-amount">1L</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping">
+            <span class="shop-name">Lentil chips (salted)</span>
+            <span class="shop-amount">95g</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping">
+            <span class="shop-name">Haimisha gherkins</span>
+            <span class="shop-amount">670g jar</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping">
+            <span class="shop-name">Chia seeds</span>
+            <span class="shop-amount">small pack</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping">
+            <span class="shop-name">Mixed seeds</span>
+            <span class="shop-amount">small pack</span>
+          </label>
+        </li>
       </ul>
     </div>
     <div class="shop-card">
       <div class="shop-card-head"><div class="shop-cat">Fruit</div></div>
       <ul class="shop-list">
-        <li>Bananas <span class="shop-amount">5-pack</span></li>
-        <li>Oranges <span class="shop-amount">4</span></li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping">
+            <span class="shop-name">Bananas</span>
+            <span class="shop-amount">5-pack</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping">
+            <span class="shop-name">Oranges</span>
+            <span class="shop-amount">4</span>
+          </label>
+        </li>
       </ul>
     </div>
   </div>
@@ -1141,6 +1519,7 @@
   <div class="section-title">Training-week shopping list</div>
   <div class="section-sub">Base list + protein boosters, merged into one. Quantities reflect the muscle-building targets — bumped items and additions are flagged.</div>
   <button class="print-btn" onclick="printFocused('shopping-muscle')">Print this list</button>
+  <button class="reset-btn" onclick="resetShopChecks('shopping-muscle')">Reset checks</button>
   <div class="merged-key">
     <span><span class="key-bumped">↑</span> Quantity increased from baseline</span>
     <span><span class="key-new">+</span> New item</span>
@@ -1149,85 +1528,409 @@
     <div class="shop-card">
       <div class="shop-card-head"><div class="shop-cat">Eggs &amp; Dairy</div></div>
       <ul class="shop-list">
-        <li>Free range large eggs <span class="shop-amount"><span class="merged-badge">↑</span>24</span></li>
-        <li>Greek yoghurt <span class="shop-amount"><span class="merged-badge">↑</span>1kg</span></li>
-        <li>Cottage cheese (reduced fat) <span class="shop-amount"><span class="merged-badge">↑</span>600g</span></li>
-        <li>Halloumi <span class="shop-amount">250g</span></li>
-        <li>Kefir drink <span class="shop-amount">500ml</span></li>
-        <li>Salted butter <span class="shop-amount">250g</span></li>
-        <li>Whole milk <span class="shop-amount">500ml</span></li>
-        <li>Vegetarian hard cheese <span class="shop-amount"><span class="merged-badge">+</span>200g block</span></li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping-muscle">
+            <span class="shop-name">Free range large eggs</span>
+            <span class="shop-amount"><span class="merged-badge">↑</span>24</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping-muscle">
+            <span class="shop-name">Greek yoghurt</span>
+            <span class="shop-amount"><span class="merged-badge">↑</span>1kg</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping-muscle">
+            <span class="shop-name">Cottage cheese (reduced fat)</span>
+            <span class="shop-amount"><span class="merged-badge">↑</span>600g</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping-muscle">
+            <span class="shop-name">Halloumi</span>
+            <span class="shop-amount">250g</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping-muscle">
+            <span class="shop-name">Kefir drink</span>
+            <span class="shop-amount">500ml</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping-muscle">
+            <span class="shop-name">Salted butter</span>
+            <span class="shop-amount">250g</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping-muscle">
+            <span class="shop-name">Whole milk</span>
+            <span class="shop-amount">500ml</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping-muscle">
+            <span class="shop-name">Vegetarian hard cheese</span>
+            <span class="shop-amount"><span class="merged-badge">+</span>200g block</span>
+          </label>
+        </li>
       </ul>
     </div>
     <div class="shop-card">
       <div class="shop-card-head"><div class="shop-cat">Veggie Protein</div></div>
       <ul class="shop-list">
-        <li>Quorn vegetarian mince <span class="shop-amount">2 × 500g</span></li>
-        <li>Firm tofu <span class="shop-amount"><span class="merged-badge">↑</span>600g</span></li>
-        <li>Vegetarian Kyiv <span class="shop-amount">310g pack</span></li>
-        <li>Beetroot &amp; kale burgers <span class="shop-amount">220g</span></li>
-        <li>Cannellini beans (tin) <span class="shop-amount">2 × 400g</span></li>
-        <li>Black beans (tin) <span class="shop-amount"><span class="merged-badge">↑</span>3 × 400g</span></li>
-        <li>Chickpeas (tin) <span class="shop-amount"><span class="merged-badge">↑</span>3 × 400g</span></li>
-        <li>Green/brown lentils (tin) <span class="shop-amount">2 × 400g</span></li>
-        <li>Baked beans (tin) <span class="shop-amount">2 × 400g</span></li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping-muscle">
+            <span class="shop-name">Quorn vegetarian mince</span>
+            <span class="shop-amount">2 × 500g</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping-muscle">
+            <span class="shop-name">Firm tofu</span>
+            <span class="shop-amount"><span class="merged-badge">↑</span>600g</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping-muscle">
+            <span class="shop-name">Vegetarian Kyiv</span>
+            <span class="shop-amount">310g pack</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping-muscle">
+            <span class="shop-name">Beetroot &amp; kale burgers</span>
+            <span class="shop-amount">220g</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping-muscle">
+            <span class="shop-name">Cannellini beans (tin)</span>
+            <span class="shop-amount">2 × 400g</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping-muscle">
+            <span class="shop-name">Black beans (tin)</span>
+            <span class="shop-amount"><span class="merged-badge">↑</span>3 × 400g</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping-muscle">
+            <span class="shop-name">Chickpeas (tin)</span>
+            <span class="shop-amount"><span class="merged-badge">↑</span>3 × 400g</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping-muscle">
+            <span class="shop-name">Green/brown lentils (tin)</span>
+            <span class="shop-amount">2 × 400g</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping-muscle">
+            <span class="shop-name">Baked beans (tin)</span>
+            <span class="shop-amount">2 × 400g</span>
+          </label>
+        </li>
       </ul>
     </div>
     <div class="shop-card">
       <div class="shop-card-head"><div class="shop-cat">Fresh Veg</div></div>
       <ul class="shop-list">
-        <li>Baby chestnut mushrooms <span class="shop-amount">300g</span></li>
-        <li>Mixed peppers <span class="shop-amount">4-pack</span></li>
-        <li>Vine tomatoes <span class="shop-amount">450g</span></li>
-        <li>Avocados <span class="shop-amount">3</span></li>
-        <li>Sweet potatoes <span class="shop-amount">3 medium</span></li>
-        <li>Salad onions <span class="shop-amount">1 bunch</span></li>
-        <li>Brown onions <span class="shop-amount">3-pack</span></li>
-        <li>Cucumber <span class="shop-amount">1</span></li>
-        <li>Babyleaf salad <span class="shop-amount">90g</span></li>
-        <li>Cooked beetroot <span class="shop-amount">250g</span></li>
-        <li>Chives <span class="shop-amount">25g</span></li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping-muscle">
+            <span class="shop-name">Baby chestnut mushrooms</span>
+            <span class="shop-amount">300g</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping-muscle">
+            <span class="shop-name">Mixed peppers</span>
+            <span class="shop-amount">4-pack</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping-muscle">
+            <span class="shop-name">Vine tomatoes</span>
+            <span class="shop-amount">450g</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping-muscle">
+            <span class="shop-name">Avocados</span>
+            <span class="shop-amount">3</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping-muscle">
+            <span class="shop-name">Sweet potatoes</span>
+            <span class="shop-amount">3 medium</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping-muscle">
+            <span class="shop-name">Salad onions</span>
+            <span class="shop-amount">1 bunch</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping-muscle">
+            <span class="shop-name">Brown onions</span>
+            <span class="shop-amount">3-pack</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping-muscle">
+            <span class="shop-name">Cucumber</span>
+            <span class="shop-amount">1</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping-muscle">
+            <span class="shop-name">Babyleaf salad</span>
+            <span class="shop-amount">90g</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping-muscle">
+            <span class="shop-name">Cooked beetroot</span>
+            <span class="shop-amount">250g</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping-muscle">
+            <span class="shop-name">Chives</span>
+            <span class="shop-amount">25g</span>
+          </label>
+        </li>
       </ul>
     </div>
     <div class="shop-card">
       <div class="shop-card-head"><div class="shop-cat">Frozen</div></div>
       <ul class="shop-list">
-        <li>Petits pois <span class="shop-amount">910g</span></li>
-        <li>Supersweet sweetcorn <span class="shop-amount">1kg</span></li>
-        <li>Mixed summer fruits <span class="shop-amount">500g</span></li>
-        <li>Blueberries <span class="shop-amount">350g</span></li>
-        <li>Edamame, podded <span class="shop-amount"><span class="merged-badge">+</span>500g</span></li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping-muscle">
+            <span class="shop-name">Petits pois</span>
+            <span class="shop-amount">910g</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping-muscle">
+            <span class="shop-name">Supersweet sweetcorn</span>
+            <span class="shop-amount">1kg</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping-muscle">
+            <span class="shop-name">Mixed summer fruits</span>
+            <span class="shop-amount">500g</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping-muscle">
+            <span class="shop-name">Blueberries</span>
+            <span class="shop-amount">350g</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping-muscle">
+            <span class="shop-name">Edamame, podded</span>
+            <span class="shop-amount"><span class="merged-badge">+</span>500g</span>
+          </label>
+        </li>
       </ul>
     </div>
     <div class="shop-card">
       <div class="shop-card-head"><div class="shop-cat">Cupboard</div></div>
       <ul class="shop-list">
-        <li>Chopped tomatoes (tin) <span class="shop-amount">4 × 400g</span></li>
-        <li>Tomato passata <span class="shop-amount">500g</span></li>
-        <li>Tomato purée <span class="shop-amount">140g</span></li>
-        <li>Fusilli pasta <span class="shop-amount">500g</span></li>
-        <li>Brown rice <span class="shop-amount">500g</span></li>
-        <li>Rolled oats <span class="shop-amount">500g</span></li>
-        <li>Rye crispbread <span class="shop-amount">1 pack</span></li>
-        <li>Wholegrain bread <span class="shop-amount">1 loaf</span></li>
-        <li>Low-carb tortilla wraps <span class="shop-amount">1 pack</span></li>
-        <li>Garlic <span class="shop-amount">1 bulb</span></li>
-        <li>Reduced-salt soy sauce <span class="shop-amount">150ml</span></li>
-        <li>Vegetable stock cubes <span class="shop-amount">1 pack</span></li>
-        <li>Unsweetened almond milk <span class="shop-amount">1L</span></li>
-        <li>Lentil chips (salted) <span class="shop-amount">95g</span></li>
-        <li>Haimisha gherkins <span class="shop-amount">670g jar</span></li>
-        <li>Chia seeds <span class="shop-amount">small pack</span></li>
-        <li>Mixed seeds <span class="shop-amount">small pack</span></li>
-        <li>Whey/pea protein, unflavoured <span class="shop-amount"><span class="merged-badge">+</span>~30 servings</span></li>
-        <li>Creatine monohydrate (optional) <span class="shop-amount"><span class="merged-badge">+</span>300g tub</span></li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping-muscle">
+            <span class="shop-name">Chopped tomatoes (tin)</span>
+            <span class="shop-amount">4 × 400g</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping-muscle">
+            <span class="shop-name">Tomato passata</span>
+            <span class="shop-amount">500g</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping-muscle">
+            <span class="shop-name">Tomato purée</span>
+            <span class="shop-amount">140g</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping-muscle">
+            <span class="shop-name">Fusilli pasta</span>
+            <span class="shop-amount">500g</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping-muscle">
+            <span class="shop-name">Brown rice</span>
+            <span class="shop-amount">500g</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping-muscle">
+            <span class="shop-name">Rolled oats</span>
+            <span class="shop-amount">500g</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping-muscle">
+            <span class="shop-name">Rye crispbread</span>
+            <span class="shop-amount">1 pack</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping-muscle">
+            <span class="shop-name">Wholegrain bread</span>
+            <span class="shop-amount">1 loaf</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping-muscle">
+            <span class="shop-name">Low-carb tortilla wraps</span>
+            <span class="shop-amount">1 pack</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping-muscle">
+            <span class="shop-name">Garlic</span>
+            <span class="shop-amount">1 bulb</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping-muscle">
+            <span class="shop-name">Reduced-salt soy sauce</span>
+            <span class="shop-amount">150ml</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping-muscle">
+            <span class="shop-name">Vegetable stock cubes</span>
+            <span class="shop-amount">1 pack</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping-muscle">
+            <span class="shop-name">Unsweetened almond milk</span>
+            <span class="shop-amount">1L</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping-muscle">
+            <span class="shop-name">Lentil chips (salted)</span>
+            <span class="shop-amount">95g</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping-muscle">
+            <span class="shop-name">Haimisha gherkins</span>
+            <span class="shop-amount">670g jar</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping-muscle">
+            <span class="shop-name">Chia seeds</span>
+            <span class="shop-amount">small pack</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping-muscle">
+            <span class="shop-name">Mixed seeds</span>
+            <span class="shop-amount">small pack</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping-muscle">
+            <span class="shop-name">Whey/pea protein, unflavoured</span>
+            <span class="shop-amount"><span class="merged-badge">+</span>~30 servings</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping-muscle">
+            <span class="shop-name">Creatine monohydrate (optional)</span>
+            <span class="shop-amount"><span class="merged-badge">+</span>300g tub</span>
+          </label>
+        </li>
       </ul>
     </div>
     <div class="shop-card">
       <div class="shop-card-head"><div class="shop-cat">Fruit</div></div>
       <ul class="shop-list">
-        <li>Bananas <span class="shop-amount">5-pack</span></li>
-        <li>Oranges <span class="shop-amount">4</span></li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping-muscle">
+            <span class="shop-name">Bananas</span>
+            <span class="shop-amount">5-pack</span>
+          </label>
+        </li>
+        <li>
+          <label class="shop-item">
+            <input type="checkbox" class="shop-check" data-section="shopping-muscle">
+            <span class="shop-name">Oranges</span>
+            <span class="shop-amount">4</span>
+          </label>
+        </li>
       </ul>
     </div>
   </div>
@@ -1413,8 +2116,58 @@ function printFocused(id) {
   }, 50);
 }
 
+// ─── Shopping list state persistence ───────────────────────────────────────
+// Checkboxes survive page reloads via localStorage. Keys are scoped to the
+// week (data-week on <body>) and section, so each week starts fresh and the
+// two shopping lists don't collide.
+
+function shopSlug(text) {
+  return text.trim().toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+function shopKey(checkbox) {
+  const week = document.body.dataset.week || 'unknown';
+  const section = checkbox.dataset.section || 'main';
+  const nameEl = checkbox.parentElement.querySelector('.shop-name');
+  const name = nameEl ? nameEl.textContent : '';
+  return `mealplan:${week}:${section}:${shopSlug(name)}`;
+}
+
+function initShopChecks() {
+  document.querySelectorAll('.shop-check').forEach(cb => {
+    try {
+      const key = shopKey(cb);
+      if (localStorage.getItem(key) === '1') cb.checked = true;
+      cb.addEventListener('change', () => {
+        try {
+          const k = shopKey(cb);
+          if (cb.checked) localStorage.setItem(k, '1');
+          else localStorage.removeItem(k);
+        } catch (e) { /* localStorage may be disabled (private mode) — fail silently */ }
+      });
+    } catch (e) { /* same */ }
+  });
+}
+
+function resetShopChecks(section) {
+  const week = document.body.dataset.week || 'unknown';
+  const prefix = `mealplan:${week}:${section}:`;
+  try {
+    Object.keys(localStorage).forEach(k => {
+      if (k.startsWith(prefix)) localStorage.removeItem(k);
+    });
+  } catch (e) { /* localStorage disabled */ }
+  document.querySelectorAll(`.shop-check[data-section="${section}"]`).forEach(cb => {
+    cb.checked = false;
+  });
+}
+
 // Default to baseline mode on load
 document.body.setAttribute('data-mode', 'base');
+// Restore any previously-ticked shopping items
+initShopChecks();
 </script>
 </body>
 </html>
