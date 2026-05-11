@@ -1,0 +1,1420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weekly Meal Plan — 11 May 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --cream: #f5f0e8;
+    --warm-white: #faf8f4;
+    --charcoal: #1e1c1a;
+    --brown: #5c3d2e;
+    --terracotta: #c4623a;
+    --sage: #7a9e7e;
+    --gold: #c8a96e;
+    --light-brown: #e8d5c0;
+    --muted: #8a7968;
+    --border: rgba(92,61,46,0.15);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--warm-white);
+    color: var(--charcoal);
+    font-weight: 300;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* HERO */
+  .hero {
+    background: var(--charcoal);
+    color: var(--cream);
+    padding: 80px 40px 60px;
+    position: relative;
+    overflow: hidden;
+    min-height: 320px;
+    display: flex;
+    align-items: flex-end;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 80% 20%, rgba(196,98,58,0.3) 0%, transparent 60%),
+                radial-gradient(ellipse at 10% 80%, rgba(122,158,126,0.2) 0%, transparent 50%);
+  }
+  .hero-inner { position: relative; max-width: 900px; margin: 0 auto; width: 100%; }
+  .hero-label {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--terracotta);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    line-height: 1.1;
+    margin-bottom: 20px;
+    font-weight: 400;
+  }
+  .hero h1 em { font-style: italic; color: var(--gold); }
+  .hero-meta {
+    display: flex;
+    gap: 32px;
+    flex-wrap: wrap;
+    font-size: 13px;
+    color: rgba(245,240,232,0.6);
+  }
+  .hero-meta span strong { color: var(--cream); font-weight: 500; }
+
+  /* NAV */
+  nav {
+    background: var(--cream);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    padding: 0 40px;
+  }
+  .nav-inner {
+    max-width: 900px;
+    margin: 0 auto;
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .nav-inner::-webkit-scrollbar { display: none; }
+  .nav-btn {
+    background: none;
+    border: none;
+    padding: 16px 20px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--muted);
+    cursor: pointer;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    letter-spacing: 0.01em;
+  }
+  .nav-btn:hover { color: var(--charcoal); }
+  .nav-btn.active { color: var(--terracotta); border-bottom-color: var(--terracotta); font-weight: 500; }
+
+  /* MAIN */
+  main { max-width: 900px; margin: 0 auto; padding: 0 40px 80px; }
+
+  /* SECTION */
+  .section { display: none; padding-top: 48px; }
+  .section.active { display: block; animation: fadeUp 0.4s ease both; }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* OVERVIEW */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 48px;
+  }
+  .stat {
+    background: var(--warm-white);
+    padding: 24px 20px;
+    text-align: center;
+  }
+  .stat-val { font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--terracotta); }
+  .stat-lbl { font-size: 12px; color: var(--muted); margin-top: 4px; letter-spacing: 0.05em; text-transform: uppercase; }
+
+  .week-grid { display: flex; flex-direction: column; gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .week-row { display: grid; grid-template-columns: 110px 1fr 1fr 1fr; background: var(--warm-white); }
+  .week-row.header { background: var(--charcoal); color: var(--cream); }
+  .week-cell { padding: 14px 16px; border-right: 1px solid var(--border); font-size: 13px; }
+  .week-cell:last-child { border-right: none; }
+  .week-row.header .week-cell { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(245,240,232,0.6); font-weight: 500; }
+  .week-day { font-weight: 500; font-size: 13px; display: flex; flex-direction: column; gap: 2px; }
+  .week-day .date { font-size: 11px; color: var(--muted); font-weight: 300; }
+  .meal-title { font-weight: 500; margin-bottom: 2px; color: var(--charcoal); }
+  .meal-kcal { font-size: 11px; color: var(--muted); }
+  .meal-link { color: var(--terracotta); font-size: 11px; text-decoration: none; margin-top: 4px; display: inline-block; }
+  .meal-link:hover { text-decoration: underline; }
+
+  /* DAYS */
+  .day-header {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 28px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .day-title { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 400; }
+  .day-date { font-size: 13px; color: var(--muted); }
+
+  .meals-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 20px; }
+
+  .recipe-card {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--warm-white);
+  }
+  .recipe-card-head {
+    background: var(--cream);
+    padding: 16px 18px;
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    transition: background 0.15s;
+  }
+  .recipe-card-head:hover { background: var(--light-brown); }
+  .recipe-type { font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--terracotta); font-weight: 500; }
+  .recipe-name { font-family: 'Playfair Display', serif; font-size: 1.05rem; line-height: 1.3; }
+  .recipe-meta { font-size: 11px; color: var(--muted); display: flex; justify-content: space-between; align-items: center; }
+  .recipe-toggle { font-size: 16px; color: var(--muted); transition: transform 0.25s; }
+  .recipe-toggle.open { transform: rotate(180deg); }
+
+  .recipe-body { display: none; padding: 18px; border-top: 1px solid var(--border); }
+  .recipe-body.open { display: block; }
+  .recipe-section { font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); font-weight: 500; margin: 14px 0 8px; }
+  .recipe-section:first-child { margin-top: 0; }
+  .ing-list { list-style: none; }
+  .ing-list li { font-size: 13px; padding: 5px 0; border-bottom: 1px solid var(--border); }
+  .ing-list li:last-child { border-bottom: none; }
+  .step-list { list-style: none; counter-reset: s; }
+  .step-list li { counter-increment: s; font-size: 13px; padding: 6px 0 6px 28px; position: relative; border-bottom: 1px solid var(--border); line-height: 1.5; }
+  .step-list li:last-child { border-bottom: none; }
+  .step-list li::before {
+    content: counter(s);
+    position: absolute; left: 0; top: 7px;
+    width: 18px; height: 18px;
+    background: var(--terracotta); color: white;
+    border-radius: 50%; font-size: 10px; font-weight: 500;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .tip {
+    background: linear-gradient(135deg, rgba(200,169,110,0.15), rgba(200,169,110,0.05));
+    border-left: 3px solid var(--gold);
+    border-radius: 0 8px 8px 0;
+    padding: 10px 12px;
+    font-size: 12px;
+    color: var(--brown);
+    margin-top: 12px;
+    line-height: 1.5;
+  }
+
+  /* SHOPPING */
+  .shop-intro { font-size: 14px; color: var(--muted); margin-bottom: 32px; line-height: 1.7; }
+  .shop-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .shop-card { background: var(--warm-white); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .shop-card-head { background: var(--charcoal); color: var(--cream); padding: 14px 18px; }
+  .shop-cat { font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gold); font-weight: 500; }
+  .shop-list { list-style: none; padding: 14px 18px; }
+  .shop-list li { font-size: 13px; padding: 6px 0; border-bottom: 1px solid var(--border); display: flex; align-items: baseline; gap: 8px; }
+  .shop-list li:last-child { border-bottom: none; }
+  .shop-list li::before { content: '—'; color: var(--terracotta); font-size: 12px; flex-shrink: 0; }
+  .shop-amount { color: var(--muted); font-size: 12px; margin-left: auto; white-space: nowrap; }
+
+  .print-btn {
+    display: inline-block;
+    margin-bottom: 28px;
+    background: var(--terracotta);
+    color: white;
+    border: none;
+    padding: 10px 22px;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    letter-spacing: 0.03em;
+    transition: background 0.15s;
+  }
+  .print-btn:hover { background: var(--brown); }
+
+  /* SECTION TITLE */
+  .section-title { font-family: 'Playfair Display', serif; font-size: 1.6rem; margin-bottom: 6px; }
+  .section-sub { font-size: 13px; color: var(--muted); margin-bottom: 32px; }
+
+  /* MUSCLE VIEW */
+  .muscle-h2 { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 400; margin: 40px 0 14px; }
+  .muscle-lead { font-size: 15px; line-height: 1.7; color: var(--brown); padding: 20px 24px; background: var(--cream); border-left: 3px solid var(--terracotta); border-radius: 0 8px 8px 0; margin-bottom: 32px; }
+  .muscle-note { font-size: 13px; line-height: 1.7; color: var(--muted); margin: 4px 0 24px; }
+  .stats-compare .stat-from { font-size: 10px; letter-spacing: 0.06em; color: var(--gold); margin-top: 6px; text-transform: uppercase; font-weight: 500; }
+
+  .lever-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 8px; }
+  .lever-card { background: var(--warm-white); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+  .lever-num { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: var(--gold); font-style: italic; line-height: 1; }
+  .lever-title { font-family: 'Playfair Display', serif; font-size: 1.15rem; margin: 4px 0 8px; }
+  .lever-card p { font-size: 13px; color: var(--brown); line-height: 1.6; }
+
+  .swap-grid { display: flex; flex-direction: column; gap: 10px; }
+  .swap-card { background: var(--warm-white); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .swap-time { background: var(--charcoal); color: var(--gold); padding: 10px 18px; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; font-weight: 500; }
+  .swap-cols { display: grid; grid-template-columns: 1fr 2fr 0.7fr; gap: 1px; background: var(--border); }
+  .swap-col { background: var(--warm-white); padding: 14px 18px; }
+  .swap-label { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; font-weight: 500; }
+  .swap-col p { font-size: 13px; color: var(--charcoal); line-height: 1.5; }
+  .swap-gain { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: var(--terracotta); }
+
+  .risk-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .risk-card { background: var(--warm-white); border: 1px solid var(--border); border-left: 3px solid var(--sage); border-radius: 0 12px 12px 0; padding: 16px 18px; }
+  .risk-title { font-weight: 500; font-size: 14px; color: var(--charcoal); margin-bottom: 6px; }
+  .risk-card p { font-size: 12px; color: var(--brown); line-height: 1.6; }
+
+  .trainer-q { background: var(--cream); border-radius: 12px; padding: 22px 28px; }
+  .trainer-q-title { font-weight: 500; font-size: 14px; margin-bottom: 12px; color: var(--charcoal); }
+  .trainer-list { padding-left: 22px; }
+  .trainer-list li { font-size: 13px; padding: 6px 0; color: var(--brown); line-height: 1.6; }
+
+  /* MODE TOGGLE */
+  .mode-toggle {
+    display: inline-flex;
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 4px;
+    margin-bottom: 24px;
+    gap: 0;
+  }
+  .mode-btn {
+    background: none;
+    border: none;
+    padding: 8px 18px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    cursor: pointer;
+    border-radius: 999px;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .mode-btn:hover { color: var(--charcoal); }
+  .mode-btn.active { background: var(--terracotta); color: white; }
+  .mode-caption { font-size: 12px; color: var(--muted); margin-bottom: 24px; line-height: 1.6; }
+  body[data-mode="muscle"] .mode-caption-base { display: none; }
+  body[data-mode="base"] .mode-caption-muscle { display: none; }
+
+  /* MEAL BOOST INDICATOR */
+  .meal-boost {
+    display: none;
+    font-size: 11px;
+    color: var(--terracotta);
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px dashed rgba(196,98,58,0.3);
+    font-style: italic;
+    line-height: 1.4;
+  }
+  .meal-boost::before { content: '+ '; font-weight: 600; font-style: normal; }
+  body[data-mode="muscle"] .meal-boost { display: block; }
+
+  /* TOOLS GRID */
+  .tools-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+    margin: 8px 0 24px;
+  }
+  .tool-card {
+    background: var(--warm-white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 22px;
+  }
+  .tool-title { font-family: 'Playfair Display', serif; font-size: 1.15rem; margin-bottom: 4px; }
+  .tool-desc { font-size: 12.5px; color: var(--muted); margin-bottom: 16px; line-height: 1.55; }
+  .tool-btn {
+    background: var(--terracotta);
+    color: white;
+    border: none;
+    padding: 10px 22px;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12.5px;
+    font-weight: 500;
+    cursor: pointer;
+    letter-spacing: 0.03em;
+    transition: background 0.15s;
+  }
+  .tool-btn:hover { background: var(--brown); }
+
+  /* MERGED SHOPPING LIST */
+  .merged-badge { color: var(--terracotta); font-weight: 600; margin-right: 4px; font-size: 11px; }
+  .merged-key { display: flex; gap: 18px; font-size: 11px; color: var(--muted); margin: 12px 0 24px; flex-wrap: wrap; }
+  .merged-key span { display: inline-flex; align-items: center; gap: 6px; }
+  .key-bumped { color: var(--terracotta); font-weight: 600; }
+  .key-new { color: var(--terracotta); font-weight: 600; }
+
+  /* LIFT LOG */
+  .session-meta {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 18px;
+  }
+  .session-meta-cell { background: var(--warm-white); padding: 12px 16px; }
+  .session-meta-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); font-weight: 500; }
+  .session-meta-line { height: 22px; border-bottom: 1px solid var(--charcoal); margin-top: 8px; }
+  .scale-hint { font-size: 10px; color: var(--muted); margin-top: 4px; }
+
+  .lift-table { width: 100%; border-collapse: collapse; margin: 8px 0 24px; font-size: 13px; }
+  .lift-table th, .lift-table td { border: 1px solid var(--border); padding: 12px 14px; text-align: left; vertical-align: middle; }
+  .lift-table th { background: var(--charcoal); color: var(--cream); font-weight: 500; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; }
+  .lift-table th.set-col { text-align: center; width: 80px; }
+  .lift-table td.set-col { text-align: center; color: rgba(0,0,0,0.18); letter-spacing: 0.15em; }
+  .lift-cat { font-size: 10px; color: var(--terracotta); letter-spacing: 0.08em; text-transform: uppercase; font-weight: 500; }
+  .lift-name { font-weight: 500; margin-top: 2px; }
+  .lift-hint { font-size: 11px; color: var(--muted); margin-top: 2px; font-style: italic; }
+  .lift-row td { background: var(--warm-white); }
+  .lift-row:nth-child(even) td { background: var(--cream); }
+
+  .progress-strip {
+    display: grid;
+    grid-template-columns: 120px repeat(4, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    font-size: 12px;
+    margin: 8px 0 16px;
+  }
+  .progress-strip > div { background: var(--warm-white); padding: 10px 12px; }
+  .progress-strip > .ph { background: var(--charcoal); color: var(--cream); font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 500; }
+  .progress-empty { height: 16px; border-bottom: 1px solid var(--border); }
+
+  /* FOCUSED PRINT */
+  @media print {
+    body[data-printing] .hero,
+    body[data-printing] nav,
+    body[data-printing] .section,
+    body[data-printing] .tool-btn,
+    body[data-printing] .print-btn,
+    body[data-printing] .mode-toggle { display: none !important; }
+    body[data-printing="shopping-muscle"] #shopping-muscle,
+    body[data-printing="lift-log"] #lift-log,
+    body[data-printing="shopping"] #shopping { display: block !important; }
+    body[data-printing] main { padding: 0 !important; }
+    body[data-printing] .section-title { margin-top: 0; }
+    @page { margin: 12mm; }
+  }
+
+  @media (max-width: 700px) {
+    .hero { padding: 60px 20px 40px; }
+    nav { padding: 0 20px; }
+    main { padding: 0 20px 60px; }
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+    .meals-grid { grid-template-columns: 1fr; }
+    .shop-grid { grid-template-columns: 1fr; }
+    .week-grid { display: none; }
+    .lever-grid { grid-template-columns: 1fr; }
+    .risk-grid { grid-template-columns: 1fr; }
+    .swap-cols { grid-template-columns: 1fr; }
+  }
+
+  @media print {
+    nav, .nav-btn { display: none !important; }
+    .section { display: block !important; }
+    .recipe-body { display: block !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-label">Vegetarian · Week of 11 May 2026</div>
+    <h1>This Week's<br><em>Meal Plan</em></h1>
+    <div class="hero-meta">
+      <span><strong>21 meals</strong> · 7 days</span>
+      <span><strong data-base="~1,500" data-muscle="~1,750">~1,500</strong> kcal/day</span>
+      <span><strong data-base="~95g" data-muscle="~130g">~95g</strong> protein/day</span>
+      <span>Lacto-ovo vegetarian</span>
+    </div>
+  </div>
+</div>
+
+<nav>
+  <div class="nav-inner">
+    <button class="nav-btn active" onclick="showSection('overview')">Overview</button>
+    <button class="nav-btn" onclick="showSection('mon')">Monday</button>
+    <button class="nav-btn" onclick="showSection('tue')">Tuesday</button>
+    <button class="nav-btn" onclick="showSection('wed')">Wednesday</button>
+    <button class="nav-btn" onclick="showSection('thu')">Thursday</button>
+    <button class="nav-btn" onclick="showSection('fri')">Friday</button>
+    <button class="nav-btn" onclick="showSection('sat')">Saturday</button>
+    <button class="nav-btn" onclick="showSection('sun')">Sunday</button>
+    <button class="nav-btn" onclick="showSection('shopping')">Shopping List</button>
+    <button class="nav-btn" onclick="showSection('muscle')">Build Muscle</button>
+  </div>
+</nav>
+
+<main>
+
+<!-- OVERVIEW -->
+<div id="overview" class="section active">
+  <div class="mode-toggle" role="tablist" aria-label="Mode">
+    <button class="mode-btn active" data-mode="base" onclick="setMode('base')">Baseline</button>
+    <button class="mode-btn" data-mode="muscle" onclick="setMode('muscle')">Build Muscle</button>
+  </div>
+  <div class="mode-caption mode-caption-base">Showing the standard weekly plan. Switch to <em>Build Muscle</em> to overlay protein boosters on every meal.</div>
+  <div class="mode-caption mode-caption-muscle">Muscle mode: each meal shows the booster to add, and the stats below reflect the adjusted daily targets.</div>
+  <div class="stats-row">
+    <div class="stat"><div class="stat-val" data-base="~1,500" data-muscle="~1,750">~1,500</div><div class="stat-lbl">kcal / day</div></div>
+    <div class="stat"><div class="stat-val" data-base="~95g" data-muscle="~130g">~95g</div><div class="stat-lbl">Protein / day</div></div>
+    <div class="stat"><div class="stat-val" data-base="~160g" data-muscle="~175g">~160g</div><div class="stat-lbl">Carbs / day</div></div>
+    <div class="stat"><div class="stat-val" data-base="~45g" data-muscle="~55g">~45g</div><div class="stat-lbl">Fat / day</div></div>
+  </div>
+  <div class="week-grid">
+    <div class="week-row header">
+      <div class="week-cell">Day</div>
+      <div class="week-cell">Breakfast</div>
+      <div class="week-cell">Lunch</div>
+      <div class="week-cell">Dinner</div>
+    </div>
+    <div class="week-row">
+      <div class="week-cell"><div class="week-day">Mon<span class="date">12 May</span></div></div>
+      <div class="week-cell"><div class="meal-title">Greek yoghurt & berries</div><div class="meal-kcal">~320 kcal · 20g protein</div><div class="meal-boost">300g yoghurt portion, extra seeds</div><a class="meal-link" onclick="showSection('mon')">Recipe →</a></div>
+      <div class="week-cell"><div class="meal-title">Lentil & tomato soup</div><div class="meal-kcal">~340 kcal · 18g protein</div><div class="meal-boost">Stir in 100g cottage cheese</div><a class="meal-link" onclick="showSection('mon')">Recipe →</a></div>
+      <div class="week-cell"><div class="meal-title">Quorn mince chilli with rice</div><div class="meal-kcal">~480 kcal · 32g protein</div><div class="meal-boost">+50g Quorn, 30g grated cheese on top</div><a class="meal-link" onclick="showSection('mon')">Recipe →</a></div>
+    </div>
+    <div class="week-row">
+      <div class="week-cell"><div class="week-day">Tue<span class="date">13 May</span></div></div>
+      <div class="week-cell"><div class="meal-title">Scrambled eggs on wholegrain toast</div><div class="meal-kcal">~340 kcal · 22g protein</div><div class="meal-boost">4 eggs instead of 3</div><a class="meal-link" onclick="showSection('tue')">Recipe →</a></div>
+      <div class="week-cell"><div class="meal-title">Halloumi & roasted pepper wrap</div><div class="meal-kcal">~380 kcal · 22g protein</div><div class="meal-boost">30g extra halloumi, 2 tbsp hummus</div><a class="meal-link" onclick="showSection('tue')">Recipe →</a></div>
+      <div class="week-cell"><div class="meal-title">Tofu stir-fry with peas & soy</div><div class="meal-kcal">~420 kcal · 28g protein</div><div class="meal-boost">+100g tofu, handful of edamame</div><a class="meal-link" onclick="showSection('tue')">Recipe →</a></div>
+    </div>
+    <div class="week-row">
+      <div class="week-cell"><div class="week-day">Wed<span class="date">14 May</span></div></div>
+      <div class="week-cell"><div class="meal-title">Kefir smoothie & banana</div><div class="meal-kcal">~310 kcal · 14g protein</div><div class="meal-boost">25g protein powder scoop in smoothie</div><a class="meal-link" onclick="showSection('wed')">Recipe →</a></div>
+      <div class="week-cell"><div class="meal-title">Four bean salad with cottage cheese</div><div class="meal-kcal">~360 kcal · 26g protein</div><div class="meal-boost">250g cottage cheese, +30g hard cheese</div><a class="meal-link" onclick="showSection('wed')">Recipe →</a></div>
+      <div class="week-cell"><div class="meal-title">Pasta with cannellini & tomato sauce</div><div class="meal-kcal">~490 kcal · 22g protein</div><div class="meal-boost">30g grated cheese on top</div><a class="meal-link" onclick="showSection('wed')">Recipe →</a></div>
+    </div>
+    <div class="week-row">
+      <div class="week-cell"><div class="week-day">Thu<span class="date">15 May</span></div></div>
+      <div class="week-cell"><div class="meal-title">Poached eggs & sautéed mushrooms</div><div class="meal-kcal">~300 kcal · 20g protein</div><div class="meal-boost">3 eggs instead of 2</div><a class="meal-link" onclick="showSection('thu')">Recipe →</a></div>
+      <div class="week-cell"><div class="meal-title">Rice & quinoa salad with avocado</div><div class="meal-kcal">~400 kcal · 14g protein</div><div class="meal-boost">100g cottage cheese on the side</div><a class="meal-link" onclick="showSection('thu')">Recipe →</a></div>
+      <div class="week-cell"><div class="meal-title">Black bean & sweet potato curry</div><div class="meal-kcal">~460 kcal · 18g protein</div><div class="meal-boost">Extra tin of beans, larger yoghurt portion</div><a class="meal-link" onclick="showSection('thu')">Recipe →</a></div>
+    </div>
+    <div class="week-row">
+      <div class="week-cell"><div class="week-day">Fri<span class="date">16 May</span></div></div>
+      <div class="week-cell"><div class="meal-title">Overnight oats with frozen berries</div><div class="meal-kcal">~340 kcal · 14g protein</div><div class="meal-boost">25g protein powder mixed into oats</div><a class="meal-link" onclick="showSection('fri')">Recipe →</a></div>
+      <div class="week-cell"><div class="meal-title">Beetroot & chickpea salad</div><div class="meal-kcal">~350 kcal · 16g protein</div><div class="meal-boost">Double the feta, +1 tin chickpeas</div><a class="meal-link" onclick="showSection('fri')">Recipe →</a></div>
+      <div class="week-cell"><div class="meal-title">Vegetarian kyiv with petits pois & mash</div><div class="meal-kcal">~480 kcal · 22g protein</div><div class="meal-boost">Side of cottage cheese, +1 fried egg</div><a class="meal-link" onclick="showSection('fri')">Recipe →</a></div>
+    </div>
+    <div class="week-row">
+      <div class="week-cell"><div class="week-day">Sat<span class="date">17 May</span></div></div>
+      <div class="week-cell"><div class="meal-title">Omelette with chives & tomatoes</div><div class="meal-kcal">~350 kcal · 24g protein</div><div class="meal-boost">4 eggs, 30g hard cheese in the fold</div><a class="meal-link" onclick="showSection('sat')">Recipe →</a></div>
+      <div class="week-cell"><div class="meal-title">Baked beans & poached egg on toast</div><div class="meal-kcal">~360 kcal · 24g protein</div><div class="meal-boost">2 eggs instead of 1, 30g melted cheese</div><a class="meal-link" onclick="showSection('sat')">Recipe →</a></div>
+      <div class="week-cell"><div class="meal-title">Quorn mince bolognese with fusilli</div><div class="meal-kcal">~470 kcal · 32g protein</div><div class="meal-boost">+50g Quorn, 30g grated cheese on top</div><a class="meal-link" onclick="showSection('sat')">Recipe →</a></div>
+    </div>
+    <div class="week-row">
+      <div class="week-cell"><div class="week-day">Sun<span class="date">18 May</span></div></div>
+      <div class="week-cell"><div class="meal-title">Boiled eggs, avocado & rye crispbread</div><div class="meal-kcal">~360 kcal · 20g protein</div><div class="meal-boost">3 eggs instead of 2</div><a class="meal-link" onclick="showSection('sun')">Recipe →</a></div>
+      <div class="week-cell"><div class="meal-title">Lentil chips, gherkins & babyleaf salad</div><div class="meal-kcal">~280 kcal · 8g protein</div><div class="meal-boost">100g cottage cheese on the side</div><a class="meal-link" onclick="showSection('sun')">Recipe →</a></div>
+      <div class="week-cell"><div class="meal-title">Beetroot & kale burgers with sweetcorn</div><div class="meal-kcal">~440 kcal · 20g protein</div><div class="meal-boost">30g melted cheese on burgers, edamame side</div><a class="meal-link" onclick="showSection('sun')">Recipe →</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- DAY TEMPLATE MACRO (repeated for each day) -->
+
+<!-- MONDAY -->
+<div id="mon" class="section">
+  <div class="day-header">
+    <div class="day-title">Monday</div>
+    <div class="day-date">12 May 2026</div>
+  </div>
+  <div class="meals-grid">
+    <div class="recipe-card">
+      <div class="recipe-card-head" onclick="toggleRecipe(this)">
+        <div class="recipe-type">Breakfast</div>
+        <div class="recipe-name">Greek yoghurt & berries</div>
+        <div class="recipe-meta"><span>~320 kcal · 20g protein</span><span class="recipe-toggle">▾</span></div>
+      </div>
+      <div class="recipe-body">
+        <div class="recipe-section">Ingredients</div>
+        <ul class="ing-list"><li>200g Greek yoghurt</li><li>100g frozen mixed summer fruits, thawed</li><li>1 tsp honey (optional)</li><li>1 tbsp mixed seeds</li></ul>
+        <div class="recipe-section">Method</div>
+        <ol class="step-list"><li>Spoon yoghurt into a bowl.</li><li>Top with thawed berries and juices.</li><li>Drizzle with honey, scatter seeds.</li></ol>
+        <div class="tip">Prep the night before — leave berries to thaw in the fridge overnight on top of the yoghurt.</div>
+      </div>
+    </div>
+    <div class="recipe-card">
+      <div class="recipe-card-head" onclick="toggleRecipe(this)">
+        <div class="recipe-type">Lunch</div>
+        <div class="recipe-name">Lentil & tomato soup</div>
+        <div class="recipe-meta"><span>~340 kcal · 18g protein</span><span class="recipe-toggle">▾</span></div>
+      </div>
+      <div class="recipe-body">
+        <div class="recipe-section">Ingredients</div>
+        <ul class="ing-list"><li>1 × 400g tin green lentils, drained</li><li>1 × 400g tin chopped tomatoes</li><li>1 medium onion, diced</li><li>2 garlic cloves, minced</li><li>500ml vegetable stock</li><li>1 tsp cumin, ½ tsp smoked paprika</li><li>Olive oil, salt & pepper</li></ul>
+        <div class="recipe-section">Method</div>
+        <ol class="step-list"><li>Soften onion in olive oil 5 mins.</li><li>Add garlic and spices, cook 1 min.</li><li>Add lentils, tomatoes, stock. Simmer 15 mins.</li><li>Blend half for chunky texture. Season.</li></ol>
+        <div class="tip">Makes 2 portions — refrigerate the second for a quick lunch later in the week.</div>
+      </div>
+    </div>
+    <div class="recipe-card">
+      <div class="recipe-card-head" onclick="toggleRecipe(this)">
+        <div class="recipe-type">Dinner</div>
+        <div class="recipe-name">Quorn mince chilli with rice</div>
+        <div class="recipe-meta"><span>~480 kcal · 32g protein</span><span class="recipe-toggle">▾</span></div>
+      </div>
+      <div class="recipe-body">
+        <div class="recipe-section">Ingredients</div>
+        <ul class="ing-list"><li>250g Quorn mince</li><li>1 × 400g tin black beans, drained</li><li>1 × 400g tin chopped tomatoes</li><li>1 onion, 2 garlic cloves, 1 pepper</li><li>1 tsp cumin, 1 tsp chilli powder, ½ tsp cinnamon</li><li>150g brown rice (dry)</li></ul>
+        <div class="recipe-section">Method</div>
+        <ol class="step-list"><li>Cook rice per packet. Set aside.</li><li>Fry onion 5 mins, add pepper 3 mins.</li><li>Add garlic and spices, stir 1 min.</li><li>Add Quorn, cook 3–4 mins. Add beans and tomatoes.</li><li>Simmer 20 mins. Serve over rice.</li></ol>
+        <div class="tip">Cook double the rice now — use leftovers on Thursday.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TUESDAY -->
+<div id="tue" class="section">
+  <div class="day-header"><div class="day-title">Tuesday</div><div class="day-date">13 May 2026</div></div>
+  <div class="meals-grid">
+    <div class="recipe-card">
+      <div class="recipe-card-head" onclick="toggleRecipe(this)">
+        <div class="recipe-type">Breakfast</div>
+        <div class="recipe-name">Scrambled eggs on wholegrain toast</div>
+        <div class="recipe-meta"><span>~340 kcal · 22g protein</span><span class="recipe-toggle">▾</span></div>
+      </div>
+      <div class="recipe-body">
+        <div class="recipe-section">Ingredients</div>
+        <ul class="ing-list"><li>3 large eggs</li><li>2 tbsp whole milk</li><li>2 slices wholegrain bread, toasted</li><li>Small knob of butter</li><li>Salt, pepper, chives</li></ul>
+        <div class="recipe-section">Method</div>
+        <ol class="step-list"><li>Whisk eggs with milk and seasoning.</li><li>Melt butter in non-stick pan on low heat.</li><li>Stir eggs slowly until just set — remove while still slightly glossy.</li><li>Pile onto toast, scatter chives.</li></ol>
+        <div class="tip">Low and slow is the key to creamy scrambled eggs.</div>
+      </div>
+    </div>
+    <div class="recipe-card">
+      <div class="recipe-card-head" onclick="toggleRecipe(this)">
+        <div class="recipe-type">Lunch</div>
+        <div class="recipe-name">Halloumi & roasted pepper wrap</div>
+        <div class="recipe-meta"><span>~380 kcal · 22g protein</span><span class="recipe-toggle">▾</span></div>
+      </div>
+      <div class="recipe-body">
+        <div class="recipe-section">Ingredients</div>
+        <ul class="ing-list"><li>125g halloumi, sliced</li><li>1 roasted pepper, sliced</li><li>1 low-carb tortilla wrap</li><li>Handful babyleaf salad</li><li>1 tbsp natural yoghurt or hummus</li><li>Chilli flakes, squeeze of lemon</li></ul>
+        <div class="recipe-section">Method</div>
+        <ol class="step-list"><li>Grill or pan-fry halloumi 2 mins each side.</li><li>Warm wrap in a dry pan 30 seconds.</li><li>Spread yoghurt, layer salad, pepper, halloumi.</li><li>Add chilli flakes and lemon. Roll tightly.</li></ol>
+        <div class="tip">Halloumi is best eaten immediately — it gets rubbery when cold.</div>
+      </div>
+    </div>
+    <div class="recipe-card">
+      <div class="recipe-card-head" onclick="toggleRecipe(this)">
+        <div class="recipe-type">Dinner</div>
+        <div class="recipe-name">Tofu stir-fry with peas & soy</div>
+        <div class="recipe-meta"><span>~420 kcal · 28g protein</span><span class="recipe-toggle">▾</span></div>
+      </div>
+      <div class="recipe-body">
+        <div class="recipe-section">Ingredients</div>
+        <ul class="ing-list"><li>200g firm tofu, pressed and cubed</li><li>150g frozen petits pois</li><li>1 pepper, 1 onion, 2 garlic cloves</li><li>1 tsp fresh ginger, grated</li><li>2 tbsp reduced-salt soy sauce</li><li>1 tsp sesame oil (optional)</li><li>Cooked brown rice (from Monday)</li></ul>
+        <div class="recipe-section">Method</div>
+        <ol class="step-list"><li>Press tofu 10 mins. Cube and fry until golden. Set aside.</li><li>Fry onion and pepper 4 mins. Add garlic and ginger 1 min.</li><li>Add peas, soy sauce and tofu. Toss 2 mins.</li><li>Drizzle sesame oil. Serve over rice.</li></ol>
+        <div class="tip">Pressing the tofu removes moisture and makes it much crispier when fried.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- WEDNESDAY -->
+<div id="wed" class="section">
+  <div class="day-header"><div class="day-title">Wednesday</div><div class="day-date">14 May 2026</div></div>
+  <div class="meals-grid">
+    <div class="recipe-card">
+      <div class="recipe-card-head" onclick="toggleRecipe(this)">
+        <div class="recipe-type">Breakfast</div>
+        <div class="recipe-name">Kefir smoothie & banana</div>
+        <div class="recipe-meta"><span>~310 kcal · 14g protein</span><span class="recipe-toggle">▾</span></div>
+      </div>
+      <div class="recipe-body">
+        <div class="recipe-section">Ingredients</div>
+        <ul class="ing-list"><li>250ml kefir drink (mango or plain)</li><li>100g frozen blueberries</li><li>1 banana</li><li>1 tbsp mixed seeds</li></ul>
+        <div class="recipe-section">Method</div>
+        <ol class="step-list"><li>Add all ingredients to blender.</li><li>Blend until smooth. Serve immediately.</li></ol>
+        <div class="tip">Kefir adds natural probiotics — great for gut health and immunity.</div>
+      </div>
+    </div>
+    <div class="recipe-card">
+      <div class="recipe-card-head" onclick="toggleRecipe(this)">
+        <div class="recipe-type">Lunch</div>
+        <div class="recipe-name">Four bean salad with cottage cheese</div>
+        <div class="recipe-meta"><span>~360 kcal · 26g protein</span><span class="recipe-toggle">▾</span></div>
+      </div>
+      <div class="recipe-body">
+        <div class="recipe-section">Ingredients</div>
+        <ul class="ing-list"><li>1 × 400g tin mixed beans, drained</li><li>150g reduced-fat cottage cheese</li><li>½ cucumber, diced</li><li>4 radishes, sliced</li><li>Handful babyleaf salad, 2 salad onions</li><li>1 tbsp olive oil, 1 tbsp red wine vinegar</li></ul>
+        <div class="recipe-section">Method</div>
+        <ol class="step-list"><li>Drain and rinse beans. Tip into bowl.</li><li>Add cucumber, radishes, onions, leaves.</li><li>Whisk oil and vinegar, toss through. Season.</li><li>Serve alongside cottage cheese.</li></ol>
+        <div class="tip">Keeps well in the fridge for a day — make extra if you like.</div>
+      </div>
+    </div>
+    <div class="recipe-card">
+      <div class="recipe-card-head" onclick="toggleRecipe(this)">
+        <div class="recipe-type">Dinner</div>
+        <div class="recipe-name">Pasta with cannellini & tomato sauce</div>
+        <div class="recipe-meta"><span>~490 kcal · 22g protein</span><span class="recipe-toggle">▾</span></div>
+      </div>
+      <div class="recipe-body">
+        <div class="recipe-section">Ingredients</div>
+        <ul class="ing-list"><li>100g fusilli (dry)</li><li>1 × 400g tin cannellini beans</li><li>1 × 400g tin chopped tomatoes</li><li>1 onion, 3 garlic cloves</li><li>1 tsp oregano, pinch chilli flakes</li><li>Olive oil, fresh basil</li></ul>
+        <div class="recipe-section">Method</div>
+        <ol class="step-list"><li>Cook pasta. Reserve a cup of pasta water.</li><li>Fry onion 5 mins. Add garlic and herbs 1 min.</li><li>Add tomatoes, simmer 10 mins. Add beans, 5 mins more.</li><li>Toss pasta with sauce, splash of pasta water. Serve with herbs.</li></ol>
+        <div class="tip">Cannellini beans add creaminess and a big protein and fibre boost.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- THURSDAY -->
+<div id="thu" class="section">
+  <div class="day-header"><div class="day-title">Thursday</div><div class="day-date">15 May 2026</div></div>
+  <div class="meals-grid">
+    <div class="recipe-card">
+      <div class="recipe-card-head" onclick="toggleRecipe(this)">
+        <div class="recipe-type">Breakfast</div>
+        <div class="recipe-name">Poached eggs & sautéed mushrooms</div>
+        <div class="recipe-meta"><span>~300 kcal · 20g protein</span><span class="recipe-toggle">▾</span></div>
+      </div>
+      <div class="recipe-body">
+        <div class="recipe-section">Ingredients</div>
+        <ul class="ing-list"><li>2 large eggs</li><li>200g baby chestnut mushrooms, halved</li><li>1 slice wholegrain toast</li><li>1 garlic clove, 1 tsp butter</li><li>Splash white wine vinegar</li><li>Fresh chives, salt & pepper</li></ul>
+        <div class="recipe-section">Method</div>
+        <ol class="step-list"><li>Sauté mushrooms with butter and garlic 5–6 mins. Keep warm.</li><li>Simmer water with vinegar. Swirl and poach eggs 3 mins.</li><li>Toast bread. Top with mushrooms then eggs. Scatter herbs.</li></ol>
+        <div class="tip">Vinegar in the poaching water helps the egg white bind neatly around the yolk.</div>
+      </div>
+    </div>
+    <div class="recipe-card">
+      <div class="recipe-card-head" onclick="toggleRecipe(this)">
+        <div class="recipe-type">Lunch</div>
+        <div class="recipe-name">Rice & quinoa salad with avocado</div>
+        <div class="recipe-meta"><span>~400 kcal · 14g protein</span><span class="recipe-toggle">▾</span></div>
+      </div>
+      <div class="recipe-body">
+        <div class="recipe-section">Ingredients</div>
+        <ul class="ing-list"><li>150g cooked brown rice & quinoa (Monday's batch)</li><li>1 ripe avocado, sliced</li><li>4 radishes, ½ cucumber, 2 salad onions</li><li>Handful babyleaf salad</li><li>Juice of ½ lemon, 1 tbsp olive oil</li><li>Chilli flakes, salt & pepper</li></ul>
+        <div class="recipe-section">Method</div>
+        <ol class="step-list"><li>Combine rice, quinoa and salad leaves.</li><li>Add cucumber, radishes, onions.</li><li>Whisk lemon and oil, toss through.</li><li>Top with sliced avocado. Season.</li></ol>
+        <div class="tip">Dress and serve immediately once avocado is sliced — it browns quickly.</div>
+      </div>
+    </div>
+    <div class="recipe-card">
+      <div class="recipe-card-head" onclick="toggleRecipe(this)">
+        <div class="recipe-type">Dinner</div>
+        <div class="recipe-name">Black bean & sweet potato curry</div>
+        <div class="recipe-meta"><span>~460 kcal · 18g protein</span><span class="recipe-toggle">▾</span></div>
+      </div>
+      <div class="recipe-body">
+        <div class="recipe-section">Ingredients</div>
+        <ul class="ing-list"><li>2 × 400g tins black beans, drained</li><li>2 medium sweet potatoes, cubed</li><li>1 × 400g tin chopped tomatoes</li><li>1 onion, 3 garlic cloves, 1 tsp ginger</li><li>2 tsp curry powder, 1 tsp cumin, ½ tsp turmeric</li><li>200ml veg stock, natural yoghurt to serve</li></ul>
+        <div class="recipe-section">Method</div>
+        <ol class="step-list"><li>Fry cumin seeds 30 sec. Add onion 5 mins.</li><li>Add garlic, ginger, curry powder, turmeric — 1 min.</li><li>Add sweet potato, coat in spices. Add tomatoes and stock.</li><li>Cover, simmer 20 mins until tender. Add beans, 5 mins more.</li><li>Serve with yoghurt.</li></ol>
+        <div class="tip">Even better the next day as the flavours develop.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FRIDAY -->
+<div id="fri" class="section">
+  <div class="day-header"><div class="day-title">Friday</div><div class="day-date">16 May 2026</div></div>
+  <div class="meals-grid">
+    <div class="recipe-card">
+      <div class="recipe-card-head" onclick="toggleRecipe(this)">
+        <div class="recipe-type">Breakfast</div>
+        <div class="recipe-name">Overnight oats with frozen berries</div>
+        <div class="recipe-meta"><span>~340 kcal · 14g protein</span><span class="recipe-toggle">▾</span></div>
+      </div>
+      <div class="recipe-body">
+        <div class="recipe-section">Ingredients</div>
+        <ul class="ing-list"><li>80g rolled oats</li><li>200ml almond milk</li><li>100g Greek yoghurt</li><li>1 tbsp chia seeds</li><li>100g frozen mixed berries (thawed overnight)</li><li>1 tsp honey</li></ul>
+        <div class="recipe-section">Method</div>
+        <ol class="step-list"><li>Combine oats, almond milk, yoghurt and chia seeds in a jar.</li><li>Place berries on top. Cover and refrigerate overnight.</li><li>In the morning, stir and eat cold or warm briefly.</li></ol>
+        <div class="tip">Prep Thursday evening. Chia seeds add omega-3s — great for joints and recovery.</div>
+      </div>
+    </div>
+    <div class="recipe-card">
+      <div class="recipe-card-head" onclick="toggleRecipe(this)">
+        <div class="recipe-type">Lunch</div>
+        <div class="recipe-name">Beetroot & chickpea salad</div>
+        <div class="recipe-meta"><span>~350 kcal · 16g protein</span><span class="recipe-toggle">▾</span></div>
+      </div>
+      <div class="recipe-body">
+        <div class="recipe-section">Ingredients</div>
+        <ul class="ing-list"><li>1 × 400g tin chickpeas, drained</li><li>250g cooked beetroot, cubed</li><li>Handful babyleaf salad, 2 salad onions</li><li>30g feta or goat's cheese (optional)</li><li>1 tbsp olive oil, 1 tbsp balsamic vinegar</li><li>Pumpkin seeds, salt & pepper</li></ul>
+        <div class="recipe-section">Method</div>
+        <ol class="step-list"><li>Combine chickpeas, beetroot, leaves, onions and seeds.</li><li>Whisk oil and vinegar, toss through.</li><li>Crumble cheese on top. Season.</li></ol>
+        <div class="tip">Beetroot is rich in nitrates which can help with exercise endurance.</div>
+      </div>
+    </div>
+    <div class="recipe-card">
+      <div class="recipe-card-head" onclick="toggleRecipe(this)">
+        <div class="recipe-type">Dinner</div>
+        <div class="recipe-name">Vegetarian kyiv with petits pois & mash</div>
+        <div class="recipe-meta"><span>~480 kcal · 22g protein</span><span class="recipe-toggle">▾</span></div>
+      </div>
+      <div class="recipe-body">
+        <div class="recipe-section">Ingredients</div>
+        <ul class="ing-list"><li>1 M&S Vegetarian Kyiv (310g pack)</li><li>150g frozen petits pois</li><li>2 medium potatoes, peeled and cubed</li><li>1 tbsp butter, 2 tbsp whole milk</li><li>Salt, pepper, pinch of nutmeg</li></ul>
+        <div class="recipe-section">Method</div>
+        <ol class="step-list"><li>Cook kyiv per packet (200°C, ~25–30 mins).</li><li>Boil potatoes ~15 mins, drain well.</li><li>Mash with butter and milk. Season with nutmeg.</li><li>Cook peas 3 mins. Plate up everything.</li></ol>
+        <div class="tip">A comforting Friday night dinner with minimal effort required.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SATURDAY -->
+<div id="sat" class="section">
+  <div class="day-header"><div class="day-title">Saturday</div><div class="day-date">17 May 2026</div></div>
+  <div class="meals-grid">
+    <div class="recipe-card">
+      <div class="recipe-card-head" onclick="toggleRecipe(this)">
+        <div class="recipe-type">Breakfast</div>
+        <div class="recipe-name">Omelette with chives & tomatoes</div>
+        <div class="recipe-meta"><span>~350 kcal · 24g protein</span><span class="recipe-toggle">▾</span></div>
+      </div>
+      <div class="recipe-body">
+        <div class="recipe-section">Ingredients</div>
+        <ul class="ing-list"><li>3 large eggs</li><li>1 tbsp whole milk</li><li>3 vine tomatoes, halved</li><li>Small bunch chives, snipped</li><li>1 tsp butter, salt & pepper</li></ul>
+        <div class="recipe-section">Method</div>
+        <ol class="step-list"><li>Grill or roast tomatoes 5–15 mins until soft.</li><li>Whisk eggs with milk and seasoning.</li><li>Melt butter in non-stick pan. Pour in eggs.</li><li>Draw edges inward as they set. Scatter chives, fold when mostly set.</li><li>Slide onto plate, serve with tomatoes.</li></ol>
+        <div class="tip">A leisurely Saturday morning — take your time and enjoy it.</div>
+      </div>
+    </div>
+    <div class="recipe-card">
+      <div class="recipe-card-head" onclick="toggleRecipe(this)">
+        <div class="recipe-type">Lunch</div>
+        <div class="recipe-name">Baked beans & poached egg on toast</div>
+        <div class="recipe-meta"><span>~360 kcal · 24g protein</span><span class="recipe-toggle">▾</span></div>
+      </div>
+      <div class="recipe-body">
+        <div class="recipe-section">Ingredients</div>
+        <ul class="ing-list"><li>1 × 400g tin baked beans</li><li>2 large eggs</li><li>2 slices wholegrain or rye bread</li><li>Splash of vinegar</li><li>Chilli flakes, black pepper</li></ul>
+        <div class="recipe-section">Method</div>
+        <ol class="step-list"><li>Heat beans in a saucepan.</li><li>Poach eggs in simmering water with vinegar, 3 mins.</li><li>Toast bread. Top with beans then eggs.</li><li>Season with pepper and chilli flakes.</li></ol>
+        <div class="tip">Simple, satisfying — a great protein and fibre hit mid-day.</div>
+      </div>
+    </div>
+    <div class="recipe-card">
+      <div class="recipe-card-head" onclick="toggleRecipe(this)">
+        <div class="recipe-type">Dinner</div>
+        <div class="recipe-name">Quorn mince bolognese with fusilli</div>
+        <div class="recipe-meta"><span>~470 kcal · 32g protein</span><span class="recipe-toggle">▾</span></div>
+      </div>
+      <div class="recipe-body">
+        <div class="recipe-section">Ingredients</div>
+        <ul class="ing-list"><li>250g Quorn mince (remaining half)</li><li>100g fusilli (dry)</li><li>1 × 400g tin chopped tomatoes</li><li>1 onion, 2 garlic cloves, 1 carrot</li><li>2 tsp tomato purée</li><li>1 tsp dried oregano, 1 tsp dried basil</li><li>Olive oil, grated vegetarian cheese</li></ul>
+        <div class="recipe-section">Method</div>
+        <ol class="step-list"><li>Fry onion and carrot in oil 6–7 mins.</li><li>Add garlic 1 min. Add Quorn, cook 4 mins.</li><li>Stir in tomato purée, then tomatoes and herbs. Season.</li><li>Simmer 20 mins. Cook pasta and toss with sauce.</li><li>Serve with grated cheese.</li></ol>
+        <div class="tip">Uses the second half of your Quorn pack from Monday — great batch cooking.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SUNDAY -->
+<div id="sun" class="section">
+  <div class="day-header"><div class="day-title">Sunday</div><div class="day-date">18 May 2026</div></div>
+  <div class="meals-grid">
+    <div class="recipe-card">
+      <div class="recipe-card-head" onclick="toggleRecipe(this)">
+        <div class="recipe-type">Breakfast</div>
+        <div class="recipe-name">Boiled eggs, avocado & rye crispbread</div>
+        <div class="recipe-meta"><span>~360 kcal · 20g protein</span><span class="recipe-toggle">▾</span></div>
+      </div>
+      <div class="recipe-body">
+        <div class="recipe-section">Ingredients</div>
+        <ul class="ing-list"><li>2 large eggs</li><li>1 ripe avocado</li><li>4 rye crispbreads</li><li>Juice of ½ lemon</li><li>Pinch chilli flakes, sea salt & pepper</li><li>Small handful pumpkin seeds</li></ul>
+        <div class="recipe-section">Method</div>
+        <ol class="step-list"><li>Boil eggs 7 mins. Cool under cold water and peel.</li><li>Mash avocado with lemon, salt and chilli.</li><li>Spread on crispbreads. Top with sliced egg.</li><li>Scatter pumpkin seeds.</li></ol>
+        <div class="tip">Rye crispbread has a lower glycaemic impact than white toast — steady energy.</div>
+      </div>
+    </div>
+    <div class="recipe-card">
+      <div class="recipe-card-head" onclick="toggleRecipe(this)">
+        <div class="recipe-type">Lunch</div>
+        <div class="recipe-name">Lentil chips, gherkins & babyleaf salad</div>
+        <div class="recipe-meta"><span>~280 kcal · 8g protein</span><span class="recipe-toggle">▾</span></div>
+      </div>
+      <div class="recipe-body">
+        <div class="recipe-section">Ingredients</div>
+        <ul class="ing-list"><li>1 bag Eat Real lentil chips (95g)</li><li>2–3 Haimisha gherkins, sliced</li><li>Handful babyleaf salad, 2 salad onions</li><li>1 tbsp olive oil, 1 tsp red wine vinegar</li><li>Salt & pepper</li></ul>
+        <div class="recipe-section">Method</div>
+        <ol class="step-list"><li>Toss salad, onions and gherkins with oil and vinegar. Season.</li><li>Plate alongside lentil chips and extra gherkins.</li></ol>
+        <div class="tip">A lighter Sunday lunch — keeps you going without weighing you down.</div>
+      </div>
+    </div>
+    <div class="recipe-card">
+      <div class="recipe-card-head" onclick="toggleRecipe(this)">
+        <div class="recipe-type">Dinner</div>
+        <div class="recipe-name">Beetroot & kale burgers with sweetcorn</div>
+        <div class="recipe-meta"><span>~440 kcal · 20g protein</span><span class="recipe-toggle">▾</span></div>
+      </div>
+      <div class="recipe-body">
+        <div class="recipe-section">Ingredients</div>
+        <ul class="ing-list"><li>2 Gosh! Beetroot & Kale Burgers (220g pack)</li><li>150g frozen sweetcorn</li><li>Handful babyleaf salad</li><li>1 tbsp natural yoghurt + 1 tsp hot sauce (dressing)</li><li>2 rye crispbreads or 1 wrap (optional)</li><li>Slice of tomato</li></ul>
+        <div class="recipe-section">Method</div>
+        <ol class="step-list"><li>Cook burgers per packet (200°C, 20–22 mins, or pan-fry 5 mins each side).</li><li>Cook sweetcorn in boiling water 3 mins. Drain and season.</li><li>Mix yoghurt and hot sauce for dressing.</li><li>Serve burgers with salad, tomato, dressing and sweetcorn alongside.</li></ol>
+        <div class="tip">A relaxed Sunday dinner to close out the week — minimal effort, great nutrition.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SHOPPING -->
+<div id="shopping" class="section">
+  <div class="section-title">Shopping List</div>
+  <div class="section-sub">Everything you need for the week. Quantities for 1 person, 7 days, 21 meals.</div>
+  <button class="print-btn" onclick="printFocused('shopping')">Print shopping list</button>
+  <div class="shop-grid">
+    <div class="shop-card">
+      <div class="shop-card-head"><div class="shop-cat">Eggs & Dairy</div></div>
+      <ul class="shop-list">
+        <li>Free range large eggs <span class="shop-amount">18</span></li>
+        <li>Greek yoghurt <span class="shop-amount">500g</span></li>
+        <li>Cottage cheese (reduced fat) <span class="shop-amount">300g</span></li>
+        <li>Halloumi <span class="shop-amount">250g</span></li>
+        <li>Kefir drink <span class="shop-amount">500ml</span></li>
+        <li>Salted butter <span class="shop-amount">250g</span></li>
+        <li>Whole milk <span class="shop-amount">500ml</span></li>
+      </ul>
+    </div>
+    <div class="shop-card">
+      <div class="shop-card-head"><div class="shop-cat">Veggie Protein</div></div>
+      <ul class="shop-list">
+        <li>Quorn vegetarian mince <span class="shop-amount">2 × 500g</span></li>
+        <li>Firm tofu <span class="shop-amount">400g</span></li>
+        <li>Vegetarian Kyiv <span class="shop-amount">310g pack</span></li>
+        <li>Beetroot & kale burgers <span class="shop-amount">220g</span></li>
+        <li>Cannellini beans (tin) <span class="shop-amount">2 × 400g</span></li>
+        <li>Black beans (tin) <span class="shop-amount">2 × 400g</span></li>
+        <li>Chickpeas (tin) <span class="shop-amount">2 × 400g</span></li>
+        <li>Green/brown lentils (tin) <span class="shop-amount">2 × 400g</span></li>
+        <li>Baked beans (tin) <span class="shop-amount">2 × 400g</span></li>
+      </ul>
+    </div>
+    <div class="shop-card">
+      <div class="shop-card-head"><div class="shop-cat">Fresh Veg</div></div>
+      <ul class="shop-list">
+        <li>Baby chestnut mushrooms <span class="shop-amount">300g</span></li>
+        <li>Mixed peppers <span class="shop-amount">4-pack</span></li>
+        <li>Vine tomatoes <span class="shop-amount">450g</span></li>
+        <li>Avocados <span class="shop-amount">3</span></li>
+        <li>Sweet potatoes <span class="shop-amount">3 medium</span></li>
+        <li>Salad onions <span class="shop-amount">1 bunch</span></li>
+        <li>Brown onions <span class="shop-amount">3-pack</span></li>
+        <li>Cucumber <span class="shop-amount">1</span></li>
+        <li>Babyleaf salad <span class="shop-amount">90g</span></li>
+        <li>Cooked beetroot <span class="shop-amount">250g</span></li>
+        <li>Chives <span class="shop-amount">25g</span></li>
+      </ul>
+    </div>
+    <div class="shop-card">
+      <div class="shop-card-head"><div class="shop-cat">Frozen</div></div>
+      <ul class="shop-list">
+        <li>Petits pois <span class="shop-amount">910g</span></li>
+        <li>Supersweet sweetcorn <span class="shop-amount">1kg</span></li>
+        <li>Mixed summer fruits <span class="shop-amount">500g</span></li>
+        <li>Blueberries <span class="shop-amount">350g</span></li>
+      </ul>
+    </div>
+    <div class="shop-card">
+      <div class="shop-card-head"><div class="shop-cat">Cupboard</div></div>
+      <ul class="shop-list">
+        <li>Chopped tomatoes (tin) <span class="shop-amount">4 × 400g</span></li>
+        <li>Tomato passata <span class="shop-amount">500g</span></li>
+        <li>Tomato purée <span class="shop-amount">140g</span></li>
+        <li>Fusilli pasta <span class="shop-amount">500g</span></li>
+        <li>Brown rice <span class="shop-amount">500g</span></li>
+        <li>Rolled oats <span class="shop-amount">500g</span></li>
+        <li>Rye crispbread <span class="shop-amount">1 pack</span></li>
+        <li>Wholegrain bread <span class="shop-amount">1 loaf</span></li>
+        <li>Low-carb tortilla wraps <span class="shop-amount">1 pack</span></li>
+        <li>Garlic <span class="shop-amount">1 bulb</span></li>
+        <li>Reduced-salt soy sauce <span class="shop-amount">150ml</span></li>
+        <li>Vegetable stock cubes <span class="shop-amount">1 pack</span></li>
+        <li>Unsweetened almond milk <span class="shop-amount">1L</span></li>
+        <li>Lentil chips (salted) <span class="shop-amount">95g</span></li>
+        <li>Haimisha gherkins <span class="shop-amount">670g jar</span></li>
+        <li>Chia seeds <span class="shop-amount">small pack</span></li>
+        <li>Mixed seeds <span class="shop-amount">small pack</span></li>
+      </ul>
+    </div>
+    <div class="shop-card">
+      <div class="shop-card-head"><div class="shop-cat">Fruit</div></div>
+      <ul class="shop-list">
+        <li>Bananas <span class="shop-amount">5-pack</span></li>
+        <li>Oranges <span class="shop-amount">4</span></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- BUILD MUSCLE -->
+<div id="muscle" class="section">
+  <div class="section-title">Build Muscle — Strength Track</div>
+  <div class="section-sub">An optional overlay on this week's plan for when you start working with a trainer. Higher protein, a modest calorie bump, and smart swaps that keep your shopping list almost the same.</div>
+
+  <div class="muscle-lead">Think of building muscle as <em>progressive enhancement</em>: keep the working baseline (this week's plan), layer protein in where it has the biggest payoff, and use feedback signals — energy, sleep, lift logs — to iterate. You're enhancing the plan, not rebuilding it.</div>
+
+  <!-- ADJUSTED TARGETS -->
+  <h2 class="muscle-h2">Adjusted targets</h2>
+  <div class="stats-row stats-compare">
+    <div class="stat"><div class="stat-val">~1,750</div><div class="stat-lbl">kcal / day</div><div class="stat-from">from ~1,500</div></div>
+    <div class="stat"><div class="stat-val">~130g</div><div class="stat-lbl">Protein / day</div><div class="stat-from">from ~95g</div></div>
+    <div class="stat"><div class="stat-val">~175g</div><div class="stat-lbl">Carbs / day</div><div class="stat-from">from ~160g</div></div>
+    <div class="stat"><div class="stat-val">4 ×</div><div class="stat-lbl">~30g anchors</div><div class="stat-from">3 meals + snack</div></div>
+  </div>
+  <p class="muscle-note"><strong>Protein guideline:</strong> ~1.6–2.0g per kg of body weight when training to build muscle. The "anchor" idea: ~30g of protein per eating window is roughly the upper limit your body can use efficiently in one sitting, so <em>spreading</em> intake matters as much as the daily total. At 55+ this matters more, not less — older bodies are slightly resistant to anabolic signals, so each dose has to be solid.</p>
+
+  <!-- FOUR LEVERS -->
+  <h2 class="muscle-h2">The four levers</h2>
+  <div class="lever-grid">
+    <div class="lever-card">
+      <div class="lever-num">01</div>
+      <div class="lever-title">Train</div>
+      <p>2–3 resistance sessions a week. Compound lifts first (squat, hinge, push, pull, carry). Progressive overload — tiny, steady increases week to week. Your trainer programs this.</p>
+    </div>
+    <div class="lever-card">
+      <div class="lever-num">02</div>
+      <div class="lever-title">Eat</div>
+      <p>A protein anchor at every meal (~30g). Modest calorie surplus on training days. Carbs around the session — you'll perform better and recover faster.</p>
+    </div>
+    <div class="lever-card">
+      <div class="lever-num">03</div>
+      <div class="lever-title">Recover</div>
+      <p>7–9 hours of sleep. At least 48 hours between sessions hitting the same muscle group. Walking and easy cycling are active recovery, not training.</p>
+    </div>
+    <div class="lever-card">
+      <div class="lever-num">04</div>
+      <div class="lever-title">Track</div>
+      <p>A simple log: weights &amp; reps, body weight once a week, energy &amp; sleep on a 1–5 scale. Review monthly. Adjust <em>one</em> variable at a time so you can tell what's actually working.</p>
+    </div>
+  </div>
+
+  <!-- WEEKLY SWAPS -->
+  <h2 class="muscle-h2">High-protein swaps, applied to this week</h2>
+  <p class="muscle-note">Small additions that lift each meal past the 30g anchor without rewriting the menu. Most extras come from things already on your shopping list — plus a tub of unflavoured whey or pea protein.</p>
+  <div class="swap-grid">
+    <div class="swap-card">
+      <div class="swap-time">Breakfasts</div>
+      <div class="swap-cols">
+        <div class="swap-col"><div class="swap-label">Baseline</div><p>Yoghurt with berries, oats, smoothies, eggs on toast.</p></div>
+        <div class="swap-col"><div class="swap-label">Add / swap</div><p>Stir 25g whey or pea protein into oats &amp; smoothies. Make scrambled eggs with 4 eggs instead of 3. Bump Greek yoghurt portions from 200g to 300g.</p></div>
+        <div class="swap-col"><div class="swap-label">Protein gain</div><p class="swap-gain">+10–25g</p></div>
+      </div>
+    </div>
+    <div class="swap-card">
+      <div class="swap-time">Lunches</div>
+      <div class="swap-cols">
+        <div class="swap-col"><div class="swap-label">Baseline</div><p>Soups, salads, wraps.</p></div>
+        <div class="swap-col"><div class="swap-label">Add / swap</div><p>Stir 100g cottage cheese into lentil &amp; tomato soup. Add 30g grated cheese, or a second tin of beans/chickpeas, to salads. Double the halloumi in Tuesday's wrap.</p></div>
+        <div class="swap-col"><div class="swap-label">Protein gain</div><p class="swap-gain">+10–15g</p></div>
+      </div>
+    </div>
+    <div class="swap-card">
+      <div class="swap-time">Dinners</div>
+      <div class="swap-cols">
+        <div class="swap-col"><div class="swap-label">Baseline</div><p>Chilli, stir-fry, pasta, curry, burgers.</p></div>
+        <div class="swap-col"><div class="swap-label">Add / swap</div><p>Use 300g of Quorn instead of 250g. Make the tofu stir-fry with 300g of tofu and a handful of edamame. Sprinkle 30g hard cheese over pasta and chilli. Add an extra tin of beans to the sweet potato curry.</p></div>
+        <div class="swap-col"><div class="swap-label">Protein gain</div><p class="swap-gain">+8–12g</p></div>
+      </div>
+    </div>
+    <div class="swap-card">
+      <div class="swap-time">A fourth anchor (snack or post-training)</div>
+      <div class="swap-cols">
+        <div class="swap-col"><div class="swap-label">Baseline</div><p>None — just three meals.</p></div>
+        <div class="swap-col"><div class="swap-label">Add / swap</div><p>100g cottage cheese with berries; or 200g Greek yoghurt with seeds and honey; or a protein shake within an hour of training; or 2 boiled eggs on a rye crispbread.</p></div>
+        <div class="swap-col"><div class="swap-label">Protein gain</div><p class="swap-gain">+20–25g</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADDITIONAL SHOPPING -->
+  <h2 class="muscle-h2">Add to the shopping list</h2>
+  <div class="shop-grid">
+    <div class="shop-card">
+      <div class="shop-card-head"><div class="shop-cat">Protein boosters</div></div>
+      <ul class="shop-list">
+        <li>Whey or pea protein, unflavoured <span class="shop-amount">~30 servings</span></li>
+        <li>Extra free range eggs <span class="shop-amount">+6 (24 total)</span></li>
+        <li>Extra Greek yoghurt <span class="shop-amount">+500g (1kg total)</span></li>
+        <li>Extra cottage cheese <span class="shop-amount">+300g (600g total)</span></li>
+        <li>Vegetarian hard cheese <span class="shop-amount">200g block</span></li>
+        <li>Frozen edamame, podded <span class="shop-amount">500g</span></li>
+        <li>Creatine monohydrate (optional) <span class="shop-amount">300g tub, 3–5g/day</span></li>
+      </ul>
+    </div>
+  </div>
+  <p class="muscle-note">Creatine monohydrate is one of the most evidence-backed supplements in the field — 3–5g a day, taken any time. It's vegetarian and especially useful as we get older, since vegetarians tend to have lower baseline stores. Worth flagging to your GP if you have any kidney concerns, but otherwise extremely well tolerated.</p>
+
+  <!-- RISK MANAGEMENT -->
+  <h2 class="muscle-h2">Safety &amp; risk management</h2>
+  <div class="risk-grid">
+    <div class="risk-card">
+      <div class="risk-title">Get cleared first</div>
+      <p>Before starting structured resistance training at 55+, book a check-up with your GP. Mention blood pressure, joints, and any medications.</p>
+    </div>
+    <div class="risk-card">
+      <div class="risk-title">Progress slowly</div>
+      <p>The first 4–6 weeks are for movement quality, not heavy weight. Tiny increases week-to-week beat aggressive jumps that strain joints.</p>
+    </div>
+    <div class="risk-card">
+      <div class="risk-title">Listen to signals</div>
+      <p>Sharp pain (not muscle burn), joint pain, persistent fatigue, or poor sleep: back off and review. Don't push through.</p>
+    </div>
+    <div class="risk-card">
+      <div class="risk-title">Recovery is training</div>
+      <p>Muscle is built between sessions, not during them. Treat sleep, walks, and rest days as load-bearing parts of the plan.</p>
+    </div>
+    <div class="risk-card">
+      <div class="risk-title">Hydration</div>
+      <p>Especially with extra protein and creatine: aim for clear-to-pale-yellow urine across the day. Two litres of water is a sensible floor.</p>
+    </div>
+    <div class="risk-card">
+      <div class="risk-title">Easy reversibility</div>
+      <p>Everything here is a small enhancement to a plan that already works. If a swap doesn't suit you, roll it back. No commitment is permanent.</p>
+    </div>
+  </div>
+
+  <!-- TRAINER -->
+  <h2 class="muscle-h2">Finding the right trainer</h2>
+  <p class="muscle-note">Look for someone with experience training clients 50+, ideally with a recognised qualification (CIMSPA Level 3+, or equivalent). Most trainers offer a free intro session — use it.</p>
+  <div class="trainer-q">
+    <div class="trainer-q-title">Five questions to ask before signing up:</div>
+    <ol class="trainer-list">
+      <li>How many clients in their 50s+ do you currently train, and what does a typical first month look like for them?</li>
+      <li>How do you approach progressive overload for someone newer to resistance training?</li>
+      <li>What's your protocol if a client reports joint pain or unusual fatigue?</li>
+      <li>Are you comfortable programming around a vegetarian diet and discussing protein targets?</li>
+      <li>How do we measure progress beyond weight on the bar — strength, mobility, energy, body composition?</li>
+    </ol>
+  </div>
+
+  <!-- HELPERS -->
+  <h2 class="muscle-h2">Helpers</h2>
+  <div class="tools-grid">
+    <div class="tool-card">
+      <div class="tool-title">Combined training-week shopping list</div>
+      <p class="tool-desc">A single page that merges your baseline list with the protein boosters. Bumped quantities and new items are flagged. Ready to print.</p>
+      <button class="tool-btn" onclick="showSection('shopping-muscle')">Open list →</button>
+    </div>
+    <div class="tool-card">
+      <div class="tool-title">Lift log template</div>
+      <p class="tool-desc">A printable session sheet for the gym — pre-session sleep &amp; energy, five compound movements with empty set cells, post-session notes. Print one per session or use the 4-week progress tracker.</p>
+      <button class="tool-btn" onclick="showSection('lift-log')">Open template →</button>
+    </div>
+  </div>
+</div>
+
+<!-- TRAINING WEEK SHOPPING LIST -->
+<div id="shopping-muscle" class="section">
+  <div class="section-title">Training-week shopping list</div>
+  <div class="section-sub">Base list + protein boosters, merged into one. Quantities reflect the muscle-building targets — bumped items and additions are flagged.</div>
+  <button class="print-btn" onclick="printFocused('shopping-muscle')">Print this list</button>
+  <div class="merged-key">
+    <span><span class="key-bumped">↑</span> Quantity increased from baseline</span>
+    <span><span class="key-new">+</span> New item</span>
+  </div>
+  <div class="shop-grid">
+    <div class="shop-card">
+      <div class="shop-card-head"><div class="shop-cat">Eggs &amp; Dairy</div></div>
+      <ul class="shop-list">
+        <li>Free range large eggs <span class="shop-amount"><span class="merged-badge">↑</span>24</span></li>
+        <li>Greek yoghurt <span class="shop-amount"><span class="merged-badge">↑</span>1kg</span></li>
+        <li>Cottage cheese (reduced fat) <span class="shop-amount"><span class="merged-badge">↑</span>600g</span></li>
+        <li>Halloumi <span class="shop-amount">250g</span></li>
+        <li>Kefir drink <span class="shop-amount">500ml</span></li>
+        <li>Salted butter <span class="shop-amount">250g</span></li>
+        <li>Whole milk <span class="shop-amount">500ml</span></li>
+        <li>Vegetarian hard cheese <span class="shop-amount"><span class="merged-badge">+</span>200g block</span></li>
+      </ul>
+    </div>
+    <div class="shop-card">
+      <div class="shop-card-head"><div class="shop-cat">Veggie Protein</div></div>
+      <ul class="shop-list">
+        <li>Quorn vegetarian mince <span class="shop-amount">2 × 500g</span></li>
+        <li>Firm tofu <span class="shop-amount"><span class="merged-badge">↑</span>600g</span></li>
+        <li>Vegetarian Kyiv <span class="shop-amount">310g pack</span></li>
+        <li>Beetroot &amp; kale burgers <span class="shop-amount">220g</span></li>
+        <li>Cannellini beans (tin) <span class="shop-amount">2 × 400g</span></li>
+        <li>Black beans (tin) <span class="shop-amount"><span class="merged-badge">↑</span>3 × 400g</span></li>
+        <li>Chickpeas (tin) <span class="shop-amount"><span class="merged-badge">↑</span>3 × 400g</span></li>
+        <li>Green/brown lentils (tin) <span class="shop-amount">2 × 400g</span></li>
+        <li>Baked beans (tin) <span class="shop-amount">2 × 400g</span></li>
+      </ul>
+    </div>
+    <div class="shop-card">
+      <div class="shop-card-head"><div class="shop-cat">Fresh Veg</div></div>
+      <ul class="shop-list">
+        <li>Baby chestnut mushrooms <span class="shop-amount">300g</span></li>
+        <li>Mixed peppers <span class="shop-amount">4-pack</span></li>
+        <li>Vine tomatoes <span class="shop-amount">450g</span></li>
+        <li>Avocados <span class="shop-amount">3</span></li>
+        <li>Sweet potatoes <span class="shop-amount">3 medium</span></li>
+        <li>Salad onions <span class="shop-amount">1 bunch</span></li>
+        <li>Brown onions <span class="shop-amount">3-pack</span></li>
+        <li>Cucumber <span class="shop-amount">1</span></li>
+        <li>Babyleaf salad <span class="shop-amount">90g</span></li>
+        <li>Cooked beetroot <span class="shop-amount">250g</span></li>
+        <li>Chives <span class="shop-amount">25g</span></li>
+      </ul>
+    </div>
+    <div class="shop-card">
+      <div class="shop-card-head"><div class="shop-cat">Frozen</div></div>
+      <ul class="shop-list">
+        <li>Petits pois <span class="shop-amount">910g</span></li>
+        <li>Supersweet sweetcorn <span class="shop-amount">1kg</span></li>
+        <li>Mixed summer fruits <span class="shop-amount">500g</span></li>
+        <li>Blueberries <span class="shop-amount">350g</span></li>
+        <li>Edamame, podded <span class="shop-amount"><span class="merged-badge">+</span>500g</span></li>
+      </ul>
+    </div>
+    <div class="shop-card">
+      <div class="shop-card-head"><div class="shop-cat">Cupboard</div></div>
+      <ul class="shop-list">
+        <li>Chopped tomatoes (tin) <span class="shop-amount">4 × 400g</span></li>
+        <li>Tomato passata <span class="shop-amount">500g</span></li>
+        <li>Tomato purée <span class="shop-amount">140g</span></li>
+        <li>Fusilli pasta <span class="shop-amount">500g</span></li>
+        <li>Brown rice <span class="shop-amount">500g</span></li>
+        <li>Rolled oats <span class="shop-amount">500g</span></li>
+        <li>Rye crispbread <span class="shop-amount">1 pack</span></li>
+        <li>Wholegrain bread <span class="shop-amount">1 loaf</span></li>
+        <li>Low-carb tortilla wraps <span class="shop-amount">1 pack</span></li>
+        <li>Garlic <span class="shop-amount">1 bulb</span></li>
+        <li>Reduced-salt soy sauce <span class="shop-amount">150ml</span></li>
+        <li>Vegetable stock cubes <span class="shop-amount">1 pack</span></li>
+        <li>Unsweetened almond milk <span class="shop-amount">1L</span></li>
+        <li>Lentil chips (salted) <span class="shop-amount">95g</span></li>
+        <li>Haimisha gherkins <span class="shop-amount">670g jar</span></li>
+        <li>Chia seeds <span class="shop-amount">small pack</span></li>
+        <li>Mixed seeds <span class="shop-amount">small pack</span></li>
+        <li>Whey/pea protein, unflavoured <span class="shop-amount"><span class="merged-badge">+</span>~30 servings</span></li>
+        <li>Creatine monohydrate (optional) <span class="shop-amount"><span class="merged-badge">+</span>300g tub</span></li>
+      </ul>
+    </div>
+    <div class="shop-card">
+      <div class="shop-card-head"><div class="shop-cat">Fruit</div></div>
+      <ul class="shop-list">
+        <li>Bananas <span class="shop-amount">5-pack</span></li>
+        <li>Oranges <span class="shop-amount">4</span></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- LIFT LOG TEMPLATE -->
+<div id="lift-log" class="section">
+  <div class="section-title">Lift log — session template</div>
+  <div class="section-sub">Print one per session, or use the 4-week tracker below to spot trends. Keep it simple — what got lifted, how you felt, and what to change next time.</div>
+  <button class="print-btn" onclick="printFocused('lift-log')">Print this template</button>
+
+  <h2 class="muscle-h2" style="margin-top: 28px;">Pre-session</h2>
+  <div class="session-meta">
+    <div class="session-meta-cell">
+      <div class="session-meta-label">Date</div>
+      <div class="session-meta-line"></div>
+    </div>
+    <div class="session-meta-cell">
+      <div class="session-meta-label">Week #</div>
+      <div class="session-meta-line"></div>
+    </div>
+    <div class="session-meta-cell">
+      <div class="session-meta-label">Sleep last night</div>
+      <div class="session-meta-line"></div>
+      <div class="scale-hint">1 (poor) → 5 (great)</div>
+    </div>
+    <div class="session-meta-cell">
+      <div class="session-meta-label">Energy today</div>
+      <div class="session-meta-line"></div>
+      <div class="scale-hint">1 (flat) → 5 (sharp)</div>
+    </div>
+  </div>
+
+  <h2 class="muscle-h2">The session</h2>
+  <table class="lift-table">
+    <thead>
+      <tr>
+        <th>Movement</th>
+        <th class="set-col">Set 1</th>
+        <th class="set-col">Set 2</th>
+        <th class="set-col">Set 3</th>
+        <th>Notes</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="lift-row">
+        <td><div class="lift-cat">Squat</div><div class="lift-name">Back squat / goblet squat</div><div class="lift-hint">e.g. 3 × 8 — legs &amp; trunk</div></td>
+        <td class="set-col">— × —</td>
+        <td class="set-col">— × —</td>
+        <td class="set-col">— × —</td>
+        <td></td>
+      </tr>
+      <tr class="lift-row">
+        <td><div class="lift-cat">Hinge</div><div class="lift-name">Deadlift / Romanian deadlift</div><div class="lift-hint">e.g. 3 × 6 — hamstrings &amp; back</div></td>
+        <td class="set-col">— × —</td>
+        <td class="set-col">— × —</td>
+        <td class="set-col">— × —</td>
+        <td></td>
+      </tr>
+      <tr class="lift-row">
+        <td><div class="lift-cat">Push</div><div class="lift-name">Bench press / overhead press</div><div class="lift-hint">e.g. 3 × 8 — chest, shoulders, triceps</div></td>
+        <td class="set-col">— × —</td>
+        <td class="set-col">— × —</td>
+        <td class="set-col">— × —</td>
+        <td></td>
+      </tr>
+      <tr class="lift-row">
+        <td><div class="lift-cat">Pull</div><div class="lift-name">Row / lat pulldown</div><div class="lift-hint">e.g. 3 × 10 — back &amp; biceps</div></td>
+        <td class="set-col">— × —</td>
+        <td class="set-col">— × —</td>
+        <td class="set-col">— × —</td>
+        <td></td>
+      </tr>
+      <tr class="lift-row">
+        <td><div class="lift-cat">Core / Carry</div><div class="lift-name">Plank / farmer's carry</div><div class="lift-hint">e.g. 3 × 30s — bracing &amp; grip</div></td>
+        <td class="set-col">— × —</td>
+        <td class="set-col">— × —</td>
+        <td class="set-col">— × —</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2 class="muscle-h2">Post-session</h2>
+  <div class="session-meta">
+    <div class="session-meta-cell">
+      <div class="session-meta-label">Overall RPE</div>
+      <div class="session-meta-line"></div>
+      <div class="scale-hint">1 (easy) → 10 (max)</div>
+    </div>
+    <div class="session-meta-cell">
+      <div class="session-meta-label">Duration</div>
+      <div class="session-meta-line"></div>
+    </div>
+    <div class="session-meta-cell">
+      <div class="session-meta-label">Felt good</div>
+      <div class="session-meta-line"></div>
+    </div>
+    <div class="session-meta-cell">
+      <div class="session-meta-label">Change next time</div>
+      <div class="session-meta-line"></div>
+    </div>
+  </div>
+
+  <h2 class="muscle-h2">4-week progress strip</h2>
+  <p class="muscle-note">Use this on the inside cover of your log to spot trends month over month. Tick the days you trained; jot the heaviest top-set for one movement per week.</p>
+  <div class="progress-strip">
+    <div class="ph">Week</div>
+    <div class="ph">Mon</div>
+    <div class="ph">Wed</div>
+    <div class="ph">Fri</div>
+    <div class="ph">Top set this week</div>
+    <div>Week 1</div>
+    <div class="progress-empty"></div>
+    <div class="progress-empty"></div>
+    <div class="progress-empty"></div>
+    <div class="progress-empty"></div>
+    <div>Week 2</div>
+    <div class="progress-empty"></div>
+    <div class="progress-empty"></div>
+    <div class="progress-empty"></div>
+    <div class="progress-empty"></div>
+    <div>Week 3</div>
+    <div class="progress-empty"></div>
+    <div class="progress-empty"></div>
+    <div class="progress-empty"></div>
+    <div class="progress-empty"></div>
+    <div>Week 4</div>
+    <div class="progress-empty"></div>
+    <div class="progress-empty"></div>
+    <div class="progress-empty"></div>
+    <div class="progress-empty"></div>
+  </div>
+  <p class="muscle-note"><strong>Reading the trend:</strong> if the same top-set is going up week-on-week, progressive overload is working. If it plateaus for 2+ weeks, talk to your trainer — could be programming, recovery, or fuel.</p>
+</div>
+
+</main>
+
+<script>
+// Subsidiary sections that should keep their parent nav button highlighted
+const NAV_PARENT = {
+  'shopping-muscle': 'muscle',
+  'lift-log': 'muscle'
+};
+
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  const target = document.getElementById(id);
+  if (target) target.classList.add('active');
+  const navId = NAV_PARENT[id] || id;
+  document.querySelectorAll('.nav-btn').forEach(b => {
+    const onclick = b.getAttribute('onclick') || '';
+    if (onclick.includes("'" + navId + "'")) b.classList.add('active');
+  });
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function toggleRecipe(head) {
+  const body = head.nextElementSibling;
+  const toggle = head.querySelector('.recipe-toggle');
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  toggle.classList.toggle('open', !isOpen);
+}
+
+function setMode(mode) {
+  document.body.setAttribute('data-mode', mode);
+  document.querySelectorAll('.mode-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.mode === mode);
+  });
+  document.querySelectorAll('[data-base][data-muscle]').forEach(el => {
+    el.textContent = el.dataset[mode];
+  });
+}
+
+function printFocused(id) {
+  document.body.dataset.printing = id;
+  // give the browser a tick to apply the print styles, then print
+  setTimeout(() => {
+    window.print();
+    setTimeout(() => { delete document.body.dataset.printing; }, 250);
+  }, 50);
+}
+
+// Default to baseline mode on load
+document.body.setAttribute('data-mode', 'base');
+</script>
+</body>
+</html>
