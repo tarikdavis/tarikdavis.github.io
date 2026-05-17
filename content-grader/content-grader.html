@@ -1,0 +1,1603 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Content Grader — Human / AI / Hybrid</title>
+<style>
+  :root {
+    --bg: #fafaf7;
+    --surface: #ffffff;
+    --surface-2: #f3f3ee;
+    --border: #e4e2db;
+    --border-strong: #cfcdc4;
+    --text: #1a1a1a;
+    --text-muted: #5b5b54;
+    --accent: #3b5bdb;
+    --accent-soft: #e7ecfd;
+    --human: #2f9e44;
+    --ai: #1971c2;
+    --hybrid: #b08019;
+    --winner: #faf3cd;
+    --danger: #c92a2a;
+    --radius: 10px;
+    --radius-sm: 6px;
+    --shadow: 0 1px 2px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.04);
+    --mono: "SF Mono", ui-monospace, Menlo, Consolas, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.5;
+  }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 28px 24px 80px; }
+  header.app { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 24px; }
+  header.app h1 { font-size: 22px; margin: 0; font-weight: 600; letter-spacing: -0.01em; }
+  header.app .subtitle { color: var(--text-muted); font-size: 13px; margin-top: 4px; }
+  header.app .privacy { font-size: 12px; color: var(--text-muted); }
+  header.app .privacy .dot { color: var(--human); }
+
+  nav.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+  nav.tabs button {
+    background: transparent; border: 0; padding: 10px 14px; font-size: 14px; font-family: inherit;
+    color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px;
+  }
+  nav.tabs button.active { color: var(--text); border-bottom-color: var(--accent); font-weight: 500; }
+  nav.tabs button:hover { color: var(--text); }
+
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 20px; box-shadow: var(--shadow); }
+  .panel h2 { font-size: 15px; margin: 0 0 4px; font-weight: 600; letter-spacing: -0.005em; }
+  .panel .help { color: var(--text-muted); font-size: 13px; margin-bottom: 16px; }
+  .step-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 22px; height: 22px; border-radius: 50%; background: var(--accent-soft); color: var(--accent);
+    font-size: 12px; font-weight: 600; margin-right: 8px;
+  }
+
+  label { font-size: 13px; font-weight: 500; color: var(--text); display: block; margin-bottom: 6px; }
+  label .hint { color: var(--text-muted); font-weight: 400; margin-left: 4px; }
+  input[type="text"], textarea, select {
+    width: 100%; font-family: inherit; font-size: 14px; padding: 10px 12px;
+    border: 1px solid var(--border-strong); border-radius: var(--radius-sm); background: var(--surface);
+    color: var(--text); transition: border-color .15s, box-shadow .15s;
+  }
+  textarea { resize: vertical; min-height: 80px; font-family: var(--sans); line-height: 1.5; }
+  textarea.content-input { min-height: 180px; font-family: var(--mono); font-size: 13px; }
+  input:focus, textarea:focus, select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  @media (max-width: 900px) { .grid-3 { grid-template-columns: 1fr; } }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 700px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  .version-card { border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px; background: var(--surface); }
+  .version-card .tag {
+    display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: 0.04em;
+    text-transform: uppercase; padding: 3px 8px; border-radius: 12px; margin-bottom: 10px;
+  }
+  .tag.human { background: #d3f9d8; color: var(--human); }
+  .tag.ai { background: #d0ebff; color: var(--ai); }
+  .tag.hybrid { background: #fff3bf; color: var(--hybrid); }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: inherit; font-size: 14px; font-weight: 500;
+    padding: 9px 16px; border-radius: var(--radius-sm); border: 1px solid transparent;
+    cursor: pointer; transition: background .15s, border-color .15s, transform .05s;
+  }
+  .btn-primary { background: var(--accent); color: white; }
+  .btn-primary:hover { background: #2f4bc0; }
+  .btn-secondary { background: var(--surface); border-color: var(--border-strong); color: var(--text); }
+  .btn-secondary:hover { background: var(--surface-2); }
+  .btn-danger { background: transparent; border-color: transparent; color: var(--danger); }
+  .btn-danger:hover { background: #fff0f0; }
+  .btn:active { transform: translateY(1px); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .actions-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+  .actions-row.spread { justify-content: space-between; }
+
+  .copy-feedback { color: var(--human); font-size: 13px; margin-left: 10px; opacity: 0; transition: opacity .2s; }
+  .copy-feedback.show { opacity: 1; }
+
+  /* Scoring cards */
+  .scores-container { display: flex; flex-direction: column; gap: 12px; }
+  .version-row {
+    display: grid;
+    grid-template-columns: minmax(240px, 1fr) minmax(0, 1.6fr);
+    gap: 24px;
+    padding: 16px 18px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    transition: background .15s, border-color .15s;
+  }
+  .version-row.is-winner { background: var(--winner); border-color: #f0c520; }
+  .version-left { display: flex; flex-direction: column; gap: 14px; }
+  .version-header { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .criteria-inputs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .criterion-input { display: flex; flex-direction: column; gap: 5px; }
+  .criterion-input .crit-label {
+    font-size: 10px; font-weight: 600; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 0.05em; margin: 0;
+  }
+  .criterion-input input {
+    width: 100%; text-align: center; padding: 8px 6px;
+    font-size: 16px; font-weight: 600; font-variant-numeric: tabular-nums;
+  }
+  .total-line {
+    display: flex; justify-content: space-between; align-items: baseline;
+    font-size: 13px; padding-top: 10px; border-top: 1px solid var(--border);
+    color: var(--text-muted);
+  }
+  .version-row.is-winner .total-line { border-top-color: #e6cf5e; }
+  .total-line .total-label { font-weight: 600; color: var(--text); text-transform: uppercase; font-size: 11px; letter-spacing: 0.05em; }
+  .total-line .total-value { font-size: 20px; font-weight: 600; color: var(--text); font-variant-numeric: tabular-nums; }
+  .total-line .total-max { color: var(--text-muted); font-size: 13px; }
+  .version-right { display: flex; flex-direction: column; gap: 10px; }
+  .rationale-row {
+    display: grid;
+    grid-template-columns: 76px minmax(0, 1fr);
+    gap: 10px;
+    align-items: start;
+  }
+  .rationale-row .rationale-label {
+    font-size: 10px; font-weight: 600; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 0.05em; padding-top: 12px;
+  }
+  .rationale-row textarea {
+    min-height: 100px;
+    font-size: 13px;
+    line-height: 1.45;
+    resize: vertical;
+  }
+  @media (max-width: 800px) {
+    .version-row { grid-template-columns: 1fr; gap: 16px; }
+    .rationale-row { grid-template-columns: 1fr; gap: 4px; }
+    .rationale-row .rationale-label { padding-top: 0; }
+  }
+  .winner-badge {
+    display: inline-block; background: #fff3bf; border: 1px solid #f0c520;
+    padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600;
+    color: #806000;
+  }
+
+  /* History */
+  .history-list { display: flex; flex-direction: column; gap: 10px; }
+  .history-item { display: flex; justify-content: space-between; align-items: center; padding: 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); }
+  .history-item .meta { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .history-item .winner-pill { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; margin-left: 6px; }
+  .winner-pill.human { background: #d3f9d8; color: var(--human); }
+  .winner-pill.ai { background: #d0ebff; color: var(--ai); }
+  .winner-pill.hybrid { background: #fff3bf; color: var(--hybrid); }
+
+  /* Modal */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: none; align-items: center; justify-content: center; z-index: 100; }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    background: var(--surface); border-radius: var(--radius); padding: 24px;
+    max-width: 720px; width: 90vw; max-height: 80vh; overflow: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  }
+  .modal h3 { margin: 0 0 12px; font-size: 16px; }
+  pre.preview { background: var(--surface-2); padding: 14px; border-radius: var(--radius-sm); font-size: 12px; max-height: 300px; overflow: auto; white-space: pre-wrap; }
+
+  .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); }
+  .empty-state .icon { font-size: 32px; margin-bottom: 12px; opacity: 0.5; }
+
+  details.tips { margin-top: 12px; padding: 10px 14px; background: var(--surface-2); border-radius: var(--radius-sm); font-size: 13px; }
+  details.tips summary { cursor: pointer; font-weight: 500; }
+  details.tips ul { margin: 8px 0 0; padding-left: 20px; }
+
+  .help-content h3 { margin-top: 24px; }
+  .help-content code { background: var(--surface-2); padding: 2px 6px; border-radius: 4px; font-family: var(--mono); font-size: 13px; }
+
+  .scoring-mode { display: inline-flex; gap: 0; border: 1px solid var(--border-strong); border-radius: var(--radius-sm); overflow: hidden; }
+  .scoring-mode button { border: 0; background: transparent; padding: 6px 12px; font-size: 12px; cursor: pointer; font-family: inherit; }
+  .scoring-mode button.active { background: var(--accent); color: white; }
+
+  /* Settings: weights grid */
+  .weights-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 4px; }
+  @media (max-width: 700px) { .weights-grid { grid-template-columns: repeat(2, 1fr); } }
+  .weight-input { display: flex; flex-direction: column; gap: 6px; padding: 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface-2); }
+  .weight-input .weight-label { font-size: 13px; font-weight: 500; }
+  .weight-input .weight-hint { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
+  .weight-input input[type="range"] { width: 100%; margin: 0; }
+  .weight-input .weight-value {
+    display: flex; justify-content: space-between; align-items: baseline;
+    font-size: 12px; color: var(--text-muted);
+  }
+  .weight-input .weight-value strong { font-size: 18px; font-weight: 600; color: var(--text); font-variant-numeric: tabular-nums; }
+
+  /* Mode tabs for API grading */
+  .mode-tabs {
+    display: inline-flex;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 3px;
+    gap: 2px;
+  }
+  .mode-tab {
+    background: transparent;
+    border: 0;
+    padding: 7px 14px;
+    font-size: 13px;
+    font-family: inherit;
+    color: var(--text-muted);
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 500;
+  }
+  .mode-tab.active {
+    background: var(--surface);
+    color: var(--text);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  }
+  .mode-tab:hover:not(.active) { color: var(--text); }
+
+  /* Warning box */
+  .warning-box {
+    background: #fff3bf; border: 1px solid #f0c520; color: #5b4500;
+    padding: 12px 14px; border-radius: var(--radius-sm); font-size: 13px; line-height: 1.55;
+  }
+  .warning-box strong { color: #806000; }
+
+  /* API status pill */
+  #api-status { font-size: 13px; padding: 4px 10px; border-radius: 12px; }
+  #api-status.success { background: #d3f9d8; color: var(--human); }
+  #api-status.error { background: #ffe3e3; color: var(--danger); }
+  #api-status.pending { background: var(--surface-2); color: var(--text-muted); }
+
+  /* Auto-grade button */
+  .ai-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .ai-actions .api-hint { font-size: 12px; color: var(--text-muted); }
+
+  /* Total line shows weighted/raw */
+  .total-line .total-raw { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="app">
+    <div>
+      <h1>Content Grader</h1>
+      <div class="subtitle">Compare human, AI, and hybrid content. Score it. Keep the winners.</div>
+    </div>
+    <div class="privacy"><span class="dot">●</span> All data stays in your browser</div>
+  </header>
+
+  <nav class="tabs">
+    <button id="tab-new" class="active" onclick="switchTab('new')">New experiment</button>
+    <button id="tab-history" onclick="switchTab('history')">History <span id="history-count" style="color:var(--text-muted)"></span></button>
+    <button id="tab-settings" onclick="switchTab('settings')">Settings</button>
+    <button id="tab-help" onclick="switchTab('help')">How it works</button>
+  </nav>
+
+  <!-- =================== NEW EXPERIMENT =================== -->
+  <section id="view-new">
+
+    <!-- 1. Brief -->
+    <div class="panel">
+      <h2><span class="step-num">1</span>Set the brief</h2>
+      <p class="help">What was the original task? This gives the grader (and future you) the context to judge fairly.</p>
+      <div class="grid-2">
+        <div>
+          <label>Experiment title</label>
+          <input type="text" id="exp-title" placeholder="e.g. Q3 newsletter intro paragraph" />
+        </div>
+        <div>
+          <label>Content type <span class="hint">optional</span></label>
+          <input type="text" id="exp-type" placeholder="e.g. blog post, microcopy, technical doc" />
+        </div>
+      </div>
+      <div style="margin-top: 14px;">
+        <label>The brief / original prompt</label>
+        <textarea id="exp-brief" placeholder="The prompt or task each version was responding to. e.g. 'Write a 120-word intro for our Q3 newsletter announcing a pricing change. Tone: warm but direct. Audience: existing SMB customers.'"></textarea>
+      </div>
+      <div style="margin-top: 14px;">
+        <label>Audience / context <span class="hint">optional</span></label>
+        <input type="text" id="exp-audience" placeholder="e.g. SMB customers, technical readers, internal stakeholders" />
+      </div>
+    </div>
+
+    <!-- 2. Versions -->
+    <div class="panel">
+      <h2><span class="step-num">2</span>Paste the three versions</h2>
+      <p class="help">Leave any version blank if you only want to compare two.</p>
+      <div class="grid-3">
+        <div class="version-card">
+          <span class="tag human">Human</span>
+          <label>Author <span class="hint">optional</span></label>
+          <input type="text" class="author-input" data-version="human" placeholder="e.g. Sam (marketing)" />
+          <label style="margin-top: 10px;">Content</label>
+          <textarea class="content-input" oninput="autoSizeTextarea(this)" data-version="human" placeholder="Paste the human-written version here…"></textarea>
+        </div>
+        <div class="version-card">
+          <span class="tag ai">AI</span>
+          <label>Source <span class="hint">optional</span></label>
+          <input type="text" class="author-input" data-version="ai" placeholder="e.g. Claude Sonnet 4.6" />
+          <label style="margin-top: 10px;">Content</label>
+          <textarea class="content-input" oninput="autoSizeTextarea(this)" data-version="ai" placeholder="Paste the fully-AI-generated version here…"></textarea>
+        </div>
+        <div class="version-card">
+          <span class="tag hybrid">Hybrid</span>
+          <label>Author + tool <span class="hint">optional</span></label>
+          <input type="text" class="author-input" data-version="hybrid" placeholder="e.g. Sam + Claude (edited draft)" />
+          <label style="margin-top: 10px;">Content</label>
+          <textarea class="content-input" oninput="autoSizeTextarea(this)" data-version="hybrid" placeholder="Paste the human-edited AI draft (or AI-assisted human draft)…"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. AI grading -->
+    <div class="panel">
+      <h2><span class="step-num">3</span>Get AI grading</h2>
+      <p class="help">Generate a structured prompt, run it through Claude (or another LLM), then paste the JSON response back. The tool fills in proposed scores you can override.</p>
+
+      <div class="ai-actions">
+        <button class="btn btn-primary" onclick="autoGrade()" id="autograde-btn">Auto-grade with Claude</button>
+        <span class="api-hint" id="autograde-hint">requires API key in Settings</span>
+      </div>
+
+      <div style="margin-top: 14px; padding-top: 14px; border-top: 1px dashed var(--border); font-size: 13px; color: var(--text-muted);">Or use the manual workflow:</div>
+
+      <div class="actions-row">
+        <button class="btn btn-secondary" onclick="generatePrompt()">Generate grading prompt &amp; copy</button>
+        <button class="btn btn-secondary" onclick="previewPrompt()">Preview prompt</button>
+        <span class="copy-feedback" id="copy-feedback">Copied to clipboard</span>
+      </div>
+
+      <div style="margin-top: 18px;">
+        <label>Paste the AI's JSON response here</label>
+        <textarea id="ai-response" placeholder='Paste the JSON the model returned. Example: { "human": { "tone": { "score": 4, "rationale": "..." }, ... }, ... }'></textarea>
+        <div class="actions-row">
+          <button class="btn btn-secondary" onclick="parseResponse()">Parse &amp; fill scores</button>
+        </div>
+      </div>
+
+      <details class="tips">
+        <summary>Tips for fair grading</summary>
+        <ul>
+          <li><strong>Score the writing, not the source.</strong> Mask which version is which when you can — bias creeps in fast.</li>
+          <li><strong>Always override the AI's scores if they feel off.</strong> AI judges are useful starting points, not arbiters.</li>
+          <li><strong>Check accuracy claims yourself</strong> for anything factual — AI judges struggle with verification.</li>
+          <li><strong>Run the same brief multiple times</strong> before drawing conclusions. One sample is anecdote.</li>
+        </ul>
+      </details>
+    </div>
+
+    <!-- 4. Scores -->
+    <div class="panel">
+      <h2><span class="step-num">4</span>Review &amp; override scores</h2>
+      <p class="help">Each criterion is scored 1–5: tone fit, factual accuracy, freedom from unfair bias, and how well the content adheres to the brief. Edit anything the AI got wrong.</p>
+
+      <div class="scores-container" id="scores-container">
+        <!-- rendered by JS -->
+      </div>
+
+      <div style="margin-top: 16px;">
+        <label>Notes <span class="hint">any context you want to remember</span></label>
+        <textarea id="exp-notes" placeholder="Anything notable about this experiment — surprising results, caveats, follow-up ideas."></textarea>
+      </div>
+    </div>
+
+    <!-- 5. Save / Export -->
+    <div class="panel">
+      <h2><span class="step-num">5</span>Save &amp; export</h2>
+      <div class="actions-row spread">
+        <div style="display:flex; gap:10px; flex-wrap: wrap;">
+          <button class="btn btn-primary" onclick="saveExperiment()">Save experiment</button>
+          <button class="btn btn-secondary" onclick="exportWinnerJsonl()">Export winner as JSONL</button>
+          <button class="btn btn-secondary" onclick="resetForm()">Reset form</button>
+        </div>
+        <span class="copy-feedback" id="save-feedback">Saved</span>
+      </div>
+      <p class="help" style="margin: 14px 0 0;">JSONL is one line per record — the format most fine-tuning pipelines expect. Saved experiments live in your browser; export them periodically to a folder you back up.</p>
+    </div>
+  </section>
+
+  <!-- =================== HISTORY =================== -->
+  <section id="view-history" style="display: none;">
+    <div class="panel">
+      <h2>Saved experiments</h2>
+      <p class="help">Everything you've saved. Click an entry to load it back into the form, or export all winners as JSONL for training.</p>
+      <div class="actions-row" style="margin-bottom: 16px;">
+        <button class="btn btn-primary" onclick="exportAllJsonl()">Export all winners as JSONL</button>
+        <button class="btn btn-secondary" onclick="exportAllJson()">Export full backup (JSON)</button>
+        <button class="btn btn-danger" onclick="clearAllExperiments()">Clear all</button>
+      </div>
+      <div class="history-list" id="history-list"></div>
+    </div>
+  </section>
+
+  <!-- =================== SETTINGS =================== -->
+  <section id="view-settings" style="display: none;">
+
+    <div class="panel">
+      <h2>Rubric weights</h2>
+      <p class="help">Multiply each criterion's score by its weight before summing. Default 1×. Range 0–2. Use this to make accuracy count more than tone, or to drop bias entirely (set to 0).</p>
+      <div class="weights-grid" id="weights-grid">
+        <!-- rendered by JS -->
+      </div>
+      <div class="actions-row">
+        <button class="btn btn-primary" onclick="saveWeights()">Save weights</button>
+        <button class="btn btn-secondary" onclick="resetWeights()">Reset to 1× across the board</button>
+        <span class="copy-feedback" id="weights-feedback">Saved</span>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>AI grading <span class="hint" style="font-weight: 400; color: var(--text-muted); font-size: 13px;">optional</span></h2>
+      <p class="help">Skip the copy/paste workflow and grade in one click. Pick the mode that fits how you're using the tool.</p>
+
+      <div class="mode-tabs">
+        <button id="mode-tab-proxy" class="mode-tab active" onclick="switchApiMode('proxy')">Shared proxy</button>
+        <button id="mode-tab-direct" class="mode-tab" onclick="switchApiMode('direct')">My own API key</button>
+      </div>
+
+      <div id="mode-pane-proxy" class="mode-pane">
+        <p class="help" style="margin-top: 14px;">Use this when you (or someone) has deployed the <code>proxy/</code> Cloudflare Worker. The API key stays server-side; users only need the proxy URL and shared password if one is set. See <code>proxy/README.md</code> for deploy steps.</p>
+        <div class="grid-2">
+          <div>
+            <label>Proxy URL</label>
+            <input type="text" id="proxy-url" placeholder="https://content-grader-proxy.your-account.workers.dev" autocomplete="off" />
+          </div>
+          <div>
+            <label>Shared password <span class="hint">if the proxy requires one</span></label>
+            <input type="password" id="proxy-password" placeholder="Optional" autocomplete="off" />
+          </div>
+        </div>
+      </div>
+
+      <div id="mode-pane-direct" class="mode-pane" style="display: none;">
+        <div class="warning-box" style="margin-top: 14px;">
+          <strong>Risk note.</strong> An API key in browser storage is convenient but not enterprise-grade. Anyone with physical access to this browser (or a malicious extension) can read it. Enable the passphrase option below to encrypt it at rest. The manual copy/paste workflow always remains available — you don't need to enter a key to use the tool.
+        </div>
+        <div class="grid-2" style="margin-top: 14px;">
+          <div>
+            <label>Anthropic API key <span class="hint">sk-ant-…</span></label>
+            <input type="password" id="api-key" placeholder="Paste your Anthropic API key" autocomplete="off" />
+          </div>
+          <div>
+            <label style="display: flex; align-items: center; gap: 8px; margin-top: 22px;">
+              <input type="checkbox" id="encrypt-key" onchange="onEncryptToggle()" />
+              <span>Encrypt with a passphrase before storing</span>
+            </label>
+          </div>
+        </div>
+        <div class="grid-2" id="passphrase-fields" style="display: none; margin-top: 12px;">
+          <div>
+            <label>Passphrase</label>
+            <input type="password" id="api-passphrase" placeholder="At least 8 characters" autocomplete="new-password" />
+          </div>
+          <div>
+            <label>Confirm passphrase</label>
+            <input type="password" id="api-passphrase-confirm" placeholder="Same thing again" autocomplete="new-password" />
+          </div>
+        </div>
+        <p class="help" id="encryption-status" style="margin: 10px 0 0; font-size: 12px;"></p>
+      </div>
+
+      <div style="margin-top: 14px;">
+        <label>Model</label>
+        <select id="api-model" style="max-width: 360px;">
+          <option value="claude-sonnet-4-6">Claude Sonnet 4.6 (recommended)</option>
+          <option value="claude-haiku-4-5-20251001">Claude Haiku 4.5 (cheaper, faster)</option>
+          <option value="claude-opus-4-6">Claude Opus 4.6 (most thorough)</option>
+        </select>
+      </div>
+
+      <div class="actions-row">
+        <button class="btn btn-primary" onclick="saveApiSettings()">Save</button>
+        <button class="btn btn-secondary" onclick="testApiConnection()">Test connection</button>
+        <button class="btn btn-danger" onclick="clearApiSettings()">Clear settings</button>
+        <span id="api-status"></span>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Data</h2>
+      <p class="help">Everything is stored in this browser. Export periodically — clearing browser data wipes saved experiments.</p>
+      <div class="actions-row">
+        <button class="btn btn-primary" onclick="exportAllJson()">Export full backup (JSON)</button>
+        <button class="btn btn-danger" onclick="clearAllExperiments()">Delete all saved experiments</button>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- =================== HELP =================== -->
+  <section id="view-help" style="display: none;">
+    <div class="panel help-content">
+      <h2>How this works</h2>
+      <p>This tool runs a small experiment: you give it three versions of the same content (human, AI, hybrid), grade them on tone, accuracy, and bias, and keep the highest-scoring version. Over time you build a library of winning examples you can use to train or evaluate language models.</p>
+
+      <h3>The grading workflow</h3>
+      <ol>
+        <li><strong>Brief:</strong> Describe the task each version was responding to. Without context, "good" is impossible to judge.</li>
+        <li><strong>Versions:</strong> Paste up to three versions. Author/source labels are optional but useful for later analysis.</li>
+        <li><strong>AI grading:</strong> Click <em>Generate grading prompt</em>. The tool builds a structured prompt with all three versions and the rubric, and copies it to your clipboard. Paste it into Claude (or any LLM that returns JSON), and paste the JSON response back into the tool.</li>
+        <li><strong>Override:</strong> AI judges are a starting point. Edit any score you disagree with — your judgement is the ground truth.</li>
+        <li><strong>Save:</strong> The experiment is stored in your browser. Export winners as JSONL when you're ready to use them for training.</li>
+      </ol>
+
+      <h3>The rubric</h3>
+      <p>Each criterion is scored 1 (poor) to 5 (excellent):</p>
+      <ul>
+        <li><strong>Tone</strong> — How well the voice, register, and style fit the intended audience and purpose.</li>
+        <li><strong>Accuracy</strong> — Factual correctness, internal consistency, absence of fabricated claims.</li>
+        <li><strong>Bias</strong> — Balance and freedom from unjustified slant. Higher score = <em>less</em> biased.</li>
+        <li><strong>Brief fit</strong> — How well the content adheres to the brief's structural and format requirements (topics covered, section order, word count, format constraints). Score 3 if no brief was provided.</li>
+      </ul>
+      <p>Total is the sum (max 20). Winner = highest total. Ties are broken in order: accuracy, brief fit, tone.</p>
+
+      <h3>Data &amp; privacy</h3>
+      <p>Everything is stored in your browser's <code>localStorage</code> for this file. Nothing is sent anywhere. If you clear your browser data — or open the file in a different browser — your saved experiments are gone, so export a JSON backup periodically.</p>
+
+      <h3>JSONL export format</h3>
+      <p>Each line is one record, structured for training pipelines:</p>
+      <pre class="preview">{"prompt": "...", "completion": "...", "source": "human", "scores": {"tone": 5, "accuracy": 4, "bias": 5, "briefFit": 4, "total": 18}, "rationale": {...}, "metadata": {"title": "...", "createdAt": "...", "experimentId": "..."}}</pre>
+
+      <h3>Risk notes</h3>
+      <ul>
+        <li><strong>AI judges are imperfect.</strong> They can be confidently wrong, especially on accuracy and bias. Always sanity-check.</li>
+        <li><strong>Small samples mislead.</strong> One winning AI output doesn't mean AI is "better." Build a corpus before drawing conclusions.</li>
+        <li><strong>Selection bias.</strong> If you only train on winners, you encode your rubric — including its blind spots — into the model.</li>
+        <li><strong>Local storage is fragile.</strong> Browsers can wipe it. Export backups.</li>
+      </ul>
+    </div>
+  </section>
+
+</div>
+
+<!-- Preview modal -->
+<div class="modal-overlay" id="modal" onclick="closeModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <h3 id="modal-title">Preview</h3>
+    <pre class="preview" id="modal-body"></pre>
+    <div class="actions-row">
+      <button class="btn btn-secondary" onclick="closeModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   STATE & CONSTANTS
+   ============================================================ */
+const VERSIONS = ["human", "ai", "hybrid"];
+const CRITERIA = ["tone", "accuracy", "bias", "briefFit"];
+const CRITERIA_LABELS = {
+  tone: "Tone",
+  accuracy: "Accuracy",
+  bias: "Bias",
+  briefFit: "Brief fit",
+};
+const CRITERIA_HINTS = {
+  tone: "fit for audience",
+  accuracy: "factual correctness",
+  bias: "balance & fairness",
+  briefFit: "structural fidelity to brief",
+};
+const MAX_TOTAL = CRITERIA.length * 5;
+const STORAGE_KEY = "content-grader.experiments.v1";
+const WEIGHTS_KEY = "content-grader.weights.v1";
+const API_KEY = "content-grader.api.v1";
+const DEFAULT_WEIGHTS = Object.fromEntries(CRITERIA.map(c => [c, 1]));
+const DEFAULT_MODEL = "claude-sonnet-4-6";
+
+// Default proxy URL is pre-filled into the Settings form. Colleagues still need
+// the shared password (delivered via secure channel). Forks: change this to your
+// own Worker URL, or set to "" to leave the field blank by default.
+const DEFAULT_PROXY_URL = "https://content-grader-proxy.tarikdavis.workers.dev";
+
+let currentWeights = loadWeights();
+let apiSettings = loadApiSettings();
+
+let currentScores = blankScores();
+let currentExperimentId = null; // set when editing an existing one
+
+function blankScores() {
+  const s = {};
+  for (const v of VERSIONS) {
+    s[v] = {};
+    for (const c of CRITERIA) {
+      s[v][c] = { score: null, rationale: "" };
+    }
+  }
+  return s;
+}
+
+function loadWeights() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(WEIGHTS_KEY));
+    if (!raw || typeof raw !== "object") return { ...DEFAULT_WEIGHTS };
+    const w = { ...DEFAULT_WEIGHTS };
+    for (const c of CRITERIA) {
+      const v = Number(raw[c]);
+      if (!isNaN(v) && v >= 0 && v <= 2) w[c] = v;
+    }
+    return w;
+  } catch (e) { return { ...DEFAULT_WEIGHTS }; }
+}
+
+function persistWeights(w) {
+  localStorage.setItem(WEIGHTS_KEY, JSON.stringify(w));
+}
+
+function weightsAreDefault() {
+  return CRITERIA.every(c => Math.abs(currentWeights[c] - 1) < 0.001);
+}
+
+function maxWeightedTotal() {
+  return CRITERIA.reduce((acc, c) => acc + 5 * currentWeights[c], 0);
+}
+
+function loadApiSettings() {
+  const defaults = {
+    mode: "proxy",          // "proxy" | "direct"
+    model: DEFAULT_MODEL,
+    apiKey: "",             // plaintext (only used if encryptedKey is null)
+    encryptedKey: null,     // { ciphertext, salt, iv } base64 strings if encryption is on
+    proxyUrl: DEFAULT_PROXY_URL,
+    proxyPassword: "",
+  };
+  try {
+    const raw = JSON.parse(localStorage.getItem(API_KEY));
+    if (!raw || typeof raw !== "object") return defaults;
+    // Use the saved proxyUrl if set, otherwise fall back to the bundled default.
+    // This means new visitors and people who've never saved get the default URL,
+    // but anyone who deliberately customised it keeps their value.
+    const savedUrl = String(raw.proxyUrl || "");
+    return {
+      mode: raw.mode === "direct" ? "direct" : "proxy",
+      model: String(raw.model || DEFAULT_MODEL),
+      apiKey: String(raw.apiKey || ""),
+      encryptedKey: (raw.encryptedKey && typeof raw.encryptedKey === "object") ? raw.encryptedKey : null,
+      proxyUrl: savedUrl || DEFAULT_PROXY_URL,
+      proxyPassword: String(raw.proxyPassword || ""),
+    };
+  } catch (e) { return defaults; }
+}
+
+function persistApiSettings(s) {
+  localStorage.setItem(API_KEY, JSON.stringify(s));
+}
+
+// Session-scoped cache of the decrypted API key — never written to disk.
+let decryptedApiKeyCache = null;
+
+/* ============================================================
+   ENCRYPTION HELPERS (Web Crypto: AES-GCM + PBKDF2)
+   ============================================================ */
+function bufToB64(buf) {
+  return btoa(String.fromCharCode(...new Uint8Array(buf)));
+}
+function b64ToBuf(b64) {
+  return Uint8Array.from(atob(b64), c => c.charCodeAt(0)).buffer;
+}
+
+async function deriveKey(passphrase, saltBuf) {
+  const enc = new TextEncoder();
+  const baseKey = await crypto.subtle.importKey(
+    "raw", enc.encode(passphrase), "PBKDF2", false, ["deriveKey"]
+  );
+  return crypto.subtle.deriveKey(
+    { name: "PBKDF2", salt: saltBuf, iterations: 250_000, hash: "SHA-256" },
+    baseKey,
+    { name: "AES-GCM", length: 256 },
+    false,
+    ["encrypt", "decrypt"]
+  );
+}
+
+async function encryptString(plaintext, passphrase) {
+  const enc = new TextEncoder();
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const key = await deriveKey(passphrase, salt);
+  const ciphertext = await crypto.subtle.encrypt(
+    { name: "AES-GCM", iv },
+    key,
+    enc.encode(plaintext)
+  );
+  return {
+    ciphertext: bufToB64(ciphertext),
+    salt: bufToB64(salt),
+    iv: bufToB64(iv),
+  };
+}
+
+async function decryptString(payload, passphrase) {
+  const key = await deriveKey(passphrase, b64ToBuf(payload.salt));
+  const plain = await crypto.subtle.decrypt(
+    { name: "AES-GCM", iv: b64ToBuf(payload.iv) },
+    key,
+    b64ToBuf(payload.ciphertext)
+  );
+  return new TextDecoder().decode(plain);
+}
+
+// Resolve the API key for use — handles encrypted-at-rest path.
+// Caches in memory for the session after first decrypt.
+async function resolveApiKey() {
+  if (apiSettings.mode === "proxy") return null;
+  if (decryptedApiKeyCache) return decryptedApiKeyCache;
+  if (apiSettings.encryptedKey) {
+    const passphrase = prompt("Enter the passphrase to unlock your API key:");
+    if (!passphrase) throw new Error("Passphrase required to unlock API key");
+    try {
+      const plain = await decryptString(apiSettings.encryptedKey, passphrase);
+      decryptedApiKeyCache = plain;
+      return plain;
+    } catch (e) {
+      throw new Error("Decryption failed — wrong passphrase?");
+    }
+  }
+  if (apiSettings.apiKey) {
+    decryptedApiKeyCache = apiSettings.apiKey;
+    return apiSettings.apiKey;
+  }
+  throw new Error("No API key configured");
+}
+
+// Fill in any missing criteria when loading older saved experiments.
+function migrateScores(scores) {
+  if (!scores || typeof scores !== "object") return blankScores();
+  for (const v of VERSIONS) {
+    if (!scores[v] || typeof scores[v] !== "object") scores[v] = {};
+    for (const c of CRITERIA) {
+      if (!scores[v][c] || typeof scores[v][c] !== "object") {
+        scores[v][c] = { score: null, rationale: "" };
+      }
+    }
+  }
+  return scores;
+}
+
+/* ============================================================
+   TAB SWITCHING
+   ============================================================ */
+function switchTab(name) {
+  const tabs = ["new", "history", "settings", "help"];
+  for (const t of tabs) {
+    document.getElementById("view-" + t).style.display = (name === t) ? "" : "none";
+    document.getElementById("tab-" + t).classList.toggle("active", t === name);
+  }
+  if (name === "history") renderHistory();
+  if (name === "settings") renderSettings();
+}
+
+/* ============================================================
+   SCORE TABLE RENDERING
+   ============================================================ */
+function renderScoresTable() {
+  const container = document.getElementById("scores-container");
+  container.innerHTML = "";
+
+  const totals = {};
+  for (const v of VERSIONS) totals[v] = computeTotal(v);
+  const winner = pickWinner(totals);
+
+  for (const v of VERSIONS) {
+    const isWinner = winner === v && totals[v] > 0;
+    const row = document.createElement("div");
+    row.className = "version-row" + (isWinner ? " is-winner" : "");
+    row.dataset.version = v;
+
+    let left = `
+      <div class="version-left">
+        <div class="version-header">
+          <span class="tag ${v}">${v}</span>
+          ${isWinner ? '<span class="winner-badge">winner</span>' : ''}
+        </div>
+        <div class="criteria-inputs">`;
+    for (const c of CRITERIA) {
+      const cell = currentScores[v][c];
+      left += `
+          <div class="criterion-input">
+            <span class="crit-label">${CRITERIA_LABELS[c]}</span>
+            <input type="number" min="1" max="5" step="1" value="${cell.score ?? ''}"
+                   data-v="${v}" data-c="${c}" data-f="score"
+                   onchange="updateScore(this)" />
+          </div>`;
+    }
+    const rawTotal = computeRawTotal(v);
+    const showRaw = !weightsAreDefault() && rawTotal > 0;
+    const maxW = formatNum(maxWeightedTotal());
+    left += `
+        </div>
+        <div class="total-line">
+          <span class="total-label">Total</span>
+          <span style="text-align: right;">
+            <span><span class="total-value">${totals[v] ? formatNum(totals[v]) : '—'}</span><span class="total-max"> / ${maxW}</span></span>
+            ${showRaw ? `<div class="total-raw">raw ${rawTotal}/${MAX_TOTAL}</div>` : ''}
+          </span>
+        </div>
+      </div>`;
+
+    let right = `<div class="version-right">`;
+    for (const c of CRITERIA) {
+      const cell = currentScores[v][c];
+      right += `
+        <div class="rationale-row">
+          <div class="rationale-label">${CRITERIA_LABELS[c]}</div>
+          <textarea data-v="${v}" data-c="${c}" data-f="rationale"
+                    onchange="updateScore(this)"
+                    oninput="autoSizeTextarea(this)"
+                    placeholder="Why this score?">${escapeHtml(cell.rationale)}</textarea>
+        </div>`;
+    }
+    right += `</div>`;
+
+    row.innerHTML = left + right;
+    container.appendChild(row);
+  }
+  // After appending, size each rationale textarea to fit its existing content
+  container.querySelectorAll(".rationale-row textarea").forEach(autoSizeTextarea);
+}
+
+function escapeHtml(s) {
+  if (!s) return "";
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+// Resize a textarea to fit its content. CSS min-height still floors it.
+function autoSizeTextarea(el) {
+  el.style.height = "auto";
+  el.style.height = el.scrollHeight + "px";
+}
+
+function updateScore(el) {
+  const v = el.dataset.v, c = el.dataset.c, f = el.dataset.f;
+  let val = el.value;
+  if (f === "score") {
+    val = val === "" ? null : Math.max(1, Math.min(5, parseInt(val, 10) || 0)) || null;
+  }
+  currentScores[v][c][f] = val;
+  // Only re-render the totals/winner — preserve focus by being surgical
+  refreshTotals();
+}
+
+function refreshTotals() {
+  const totals = {};
+  for (const v of VERSIONS) totals[v] = computeTotal(v);
+  const winner = pickWinner(totals);
+  for (const v of VERSIONS) {
+    const row = document.querySelector(`.version-row[data-version="${v}"]`);
+    if (!row) continue;
+    const isWinner = winner === v && totals[v] > 0;
+    row.classList.toggle("is-winner", isWinner);
+
+    const totalValue = row.querySelector(".total-value");
+    if (totalValue) totalValue.textContent = totals[v] || '—';
+
+    const header = row.querySelector(".version-header");
+    const existingBadge = header.querySelector(".winner-badge");
+    if (isWinner && !existingBadge) {
+      header.insertAdjacentHTML("beforeend", '<span class="winner-badge">winner</span>');
+    } else if (!isWinner && existingBadge) {
+      existingBadge.remove();
+    }
+  }
+}
+
+// Raw total — sum of all criterion scores (each 1-5). 0 if any are missing.
+function computeRawTotal(version) {
+  for (const c of CRITERIA) if (!currentScores[version][c].score) return 0;
+  let total = 0;
+  for (const c of CRITERIA) total += currentScores[version][c].score;
+  return total;
+}
+
+// Weighted total — each criterion's score multiplied by its weight, then summed.
+// Returns a number rounded to 1 decimal place. 0 if any criterion is missing.
+function computeTotal(version) {
+  for (const c of CRITERIA) if (!currentScores[version][c].score) return 0;
+  let total = 0;
+  for (const c of CRITERIA) total += currentScores[version][c].score * currentWeights[c];
+  return Math.round(total * 10) / 10;
+}
+
+function pickWinner(totals) {
+  // Tiebreak order: accuracy > briefFit > tone
+  const tiebreakOrder = ["accuracy", "briefFit", "tone"];
+  let bestV = null, bestTotal = -1;
+  for (const v of VERSIONS) {
+    const t = totals[v];
+    if (!t) continue;
+    if (t > bestTotal) { bestV = v; bestTotal = t; continue; }
+    if (t === bestTotal && bestV !== null) {
+      for (const c of tiebreakOrder) {
+        const a = currentScores[v][c]?.score || 0;
+        const b = currentScores[bestV][c]?.score || 0;
+        if (a > b) { bestV = v; break; }
+        if (a < b) break;
+      }
+    }
+  }
+  return bestV;
+}
+
+/* ============================================================
+   PROMPT GENERATION
+   ============================================================ */
+function buildPrompt() {
+  const title = document.getElementById("exp-title").value.trim();
+  const brief = document.getElementById("exp-brief").value.trim();
+  const audience = document.getElementById("exp-audience").value.trim();
+  const contentType = document.getElementById("exp-type").value.trim();
+
+  const versions = {};
+  for (const v of VERSIONS) {
+    const c = getVersionContent(v);
+    if (c) versions[v] = c;
+  }
+
+  if (Object.keys(versions).length < 2) {
+    return { error: "Please paste at least two versions to compare." };
+  }
+
+  const versionBlocks = Object.entries(versions).map(([k, c]) =>
+    `### Version: ${k.toUpperCase()}\n${c}`
+  ).join("\n\n---\n\n");
+
+  const prompt = `You are an impartial content grader. Score each version of the content below on ${numberWord(CRITERIA.length)} criteria, 1 to 5.
+
+CONTEXT
+${title ? `Title: ${title}\n` : ""}${contentType ? `Type: ${contentType}\n` : ""}${audience ? `Audience: ${audience}\n` : ""}
+Brief:
+${brief || "(no brief provided)"}
+
+RUBRIC (score each 1-5)
+- tone: How well the voice, register, and style fit the intended audience and purpose. 1=mismatched, 5=perfect fit.
+- accuracy: Factual correctness, internal consistency, absence of fabricated claims. 1=multiple errors, 5=all claims supportable. If you cannot verify a claim externally, score based on internal consistency and note the uncertainty.
+- bias: Balance and freedom from unjustified slant or one-sided framing. Higher score = LESS biased. 1=heavily biased, 5=balanced and fair.
+- briefFit: How well the content adheres to the brief's structural and format requirements — topics covered, section order, word count, heading format, length constraints. 1=ignores most requirements, 5=follows every constraint precisely. If no brief was provided, score 3 (neutral).
+
+VERSIONS
+
+${versionBlocks}
+
+OUTPUT FORMAT
+Return ONLY a JSON object (no prose, no markdown fence) matching this shape exactly:
+
+{
+${Object.keys(versions).map(k => `  "${k}": {
+    "tone": { "score": <1-5>, "rationale": "<one sentence>" },
+    "accuracy": { "score": <1-5>, "rationale": "<one sentence>" },
+    "bias": { "score": <1-5>, "rationale": "<one sentence>" },
+    "briefFit": { "score": <1-5>, "rationale": "<one sentence>" }
+  }`).join(",\n")}
+}
+
+Be honest. If a version is genuinely weak on a criterion, score it low. Do not flatter.`;
+
+  return { prompt, versionsIncluded: Object.keys(versions) };
+}
+
+function getVersionContent(v) {
+  const el = document.querySelector(`.content-input[data-version="${v}"]`);
+  return el ? el.value.trim() : "";
+}
+
+async function generatePrompt() {
+  const result = buildPrompt();
+  if (result.error) { alert(result.error); return; }
+  try {
+    await navigator.clipboard.writeText(result.prompt);
+    showFeedback("copy-feedback");
+  } catch (e) {
+    // Fallback: show in modal
+    showModal("Grading prompt (copy manually)", result.prompt);
+  }
+}
+
+function previewPrompt() {
+  const result = buildPrompt();
+  if (result.error) { alert(result.error); return; }
+  showModal("Grading prompt preview", result.prompt);
+}
+
+/* ============================================================
+   RESPONSE PARSING
+   ============================================================ */
+function parseResponse() {
+  const raw = document.getElementById("ai-response").value.trim();
+  if (!raw) { alert("Paste the AI's JSON response first."); return; }
+
+  // Try to extract JSON from possibly-wrapped response
+  let jsonStr = raw;
+  // Strip markdown code fences if present
+  const fenceMatch = raw.match(/```(?:json)?\s*([\s\S]*?)```/);
+  if (fenceMatch) jsonStr = fenceMatch[1].trim();
+
+  let parsed;
+  try {
+    parsed = JSON.parse(jsonStr);
+  } catch (e) {
+    alert("Couldn't parse JSON. Make sure the response is valid JSON.\n\nError: " + e.message);
+    return;
+  }
+
+  let filled = 0;
+  for (const v of VERSIONS) {
+    if (!parsed[v]) continue;
+    for (const c of CRITERIA) {
+      const entry = parsed[v][c];
+      if (!entry) continue;
+      if (typeof entry === "number") {
+        currentScores[v][c].score = clamp15(entry);
+        filled++;
+      } else if (typeof entry === "object") {
+        if (entry.score != null) {
+          currentScores[v][c].score = clamp15(entry.score);
+          filled++;
+        }
+        if (entry.rationale) {
+          currentScores[v][c].rationale = String(entry.rationale);
+        }
+      }
+    }
+  }
+
+  if (filled === 0) {
+    alert("Parsed the JSON but found no scores in the expected shape. Expected keys: human/ai/hybrid → tone/accuracy/bias → {score, rationale}.");
+    return;
+  }
+
+  renderScoresTable();
+  showFeedback("copy-feedback", "Filled " + filled + " score" + (filled === 1 ? "" : "s"));
+}
+
+function numberWord(n) {
+  return ["zero","one","two","three","four","five","six","seven","eight"][n] || String(n);
+}
+
+function formatNum(n) {
+  if (n == null || isNaN(n)) return "—";
+  // Strip trailing .0 — show integers as integers
+  return (Math.round(n * 10) / 10).toString();
+}
+
+function clamp15(n) {
+  const x = parseInt(n, 10);
+  if (isNaN(x)) return null;
+  return Math.max(1, Math.min(5, x));
+}
+
+/* ============================================================
+   SETTINGS — WEIGHTS & API
+   ============================================================ */
+function renderSettings() {
+  const grid = document.getElementById("weights-grid");
+  grid.innerHTML = "";
+  for (const c of CRITERIA) {
+    const w = currentWeights[c];
+    const div = document.createElement("div");
+    div.className = "weight-input";
+    div.innerHTML = `
+      <div class="weight-label">${CRITERIA_LABELS[c]}</div>
+      <div class="weight-hint">${CRITERIA_HINTS[c]}</div>
+      <input type="range" min="0" max="2" step="0.25" value="${w}" data-c="${c}" oninput="onWeightSlider(this)" />
+      <div class="weight-value"><span data-weight-suffix>×</span><strong data-weight-display="${c}">${formatNum(w)}</strong></div>
+    `;
+    grid.appendChild(div);
+  }
+
+  // Mode tabs
+  switchApiMode(apiSettings.mode || "proxy", true);
+
+  // Direct mode fields
+  document.getElementById("api-key").value = apiSettings.encryptedKey ? "" : (apiSettings.apiKey || "");
+  document.getElementById("encrypt-key").checked = !!apiSettings.encryptedKey;
+  onEncryptToggle();
+  if (apiSettings.encryptedKey) {
+    document.getElementById("encryption-status").textContent = "An encrypted key is stored. Paste a new key + passphrase to replace it, or clear settings to remove.";
+    document.getElementById("api-key").placeholder = "Paste a new key to replace the encrypted one";
+  } else {
+    document.getElementById("encryption-status").textContent = "";
+  }
+
+  // Proxy mode fields
+  document.getElementById("proxy-url").value = apiSettings.proxyUrl || "";
+  document.getElementById("proxy-password").value = apiSettings.proxyPassword || "";
+
+  // Model
+  document.getElementById("api-model").value = apiSettings.model || DEFAULT_MODEL;
+
+  setApiStatus("", "");
+}
+
+function switchApiMode(mode, skipPersist) {
+  const isDirect = mode === "direct";
+  document.getElementById("mode-tab-proxy").classList.toggle("active", !isDirect);
+  document.getElementById("mode-tab-direct").classList.toggle("active", isDirect);
+  document.getElementById("mode-pane-proxy").style.display = isDirect ? "none" : "";
+  document.getElementById("mode-pane-direct").style.display = isDirect ? "" : "none";
+  apiSettings.mode = mode;
+  if (!skipPersist) persistApiSettings(apiSettings);
+  updateAutoGradeButtonState();
+}
+
+function onEncryptToggle() {
+  const checked = document.getElementById("encrypt-key").checked;
+  document.getElementById("passphrase-fields").style.display = checked ? "" : "none";
+}
+
+function onWeightSlider(el) {
+  const c = el.dataset.c;
+  const v = parseFloat(el.value);
+  currentWeights[c] = v;
+  const display = document.querySelector(`[data-weight-display="${c}"]`);
+  if (display) display.textContent = formatNum(v);
+}
+
+function saveWeights() {
+  persistWeights(currentWeights);
+  showFeedback("weights-feedback", "Saved");
+  // Re-render scoring view so the displayed totals reflect new weights immediately
+  renderScoresTable();
+}
+
+function resetWeights() {
+  currentWeights = { ...DEFAULT_WEIGHTS };
+  persistWeights(currentWeights);
+  renderSettings();
+  renderScoresTable();
+  showFeedback("weights-feedback", "Reset");
+}
+
+async function saveApiSettings() {
+  const model = document.getElementById("api-model").value;
+  const newSettings = { ...apiSettings, model };
+
+  if (apiSettings.mode === "proxy") {
+    newSettings.proxyUrl = document.getElementById("proxy-url").value.trim();
+    newSettings.proxyPassword = document.getElementById("proxy-password").value;
+    // Proxy mode doesn't use these — keep them cleared for clarity
+    newSettings.apiKey = "";
+    newSettings.encryptedKey = null;
+  } else {
+    // Direct mode
+    const key = document.getElementById("api-key").value.trim();
+    const wantsEncryption = document.getElementById("encrypt-key").checked;
+
+    if (key && wantsEncryption) {
+      const pw1 = document.getElementById("api-passphrase").value;
+      const pw2 = document.getElementById("api-passphrase-confirm").value;
+      if (pw1.length < 8) { setApiStatus("Passphrase must be at least 8 characters", "error"); return; }
+      if (pw1 !== pw2) { setApiStatus("Passphrases don't match", "error"); return; }
+      try {
+        newSettings.encryptedKey = await encryptString(key, pw1);
+        newSettings.apiKey = "";
+        decryptedApiKeyCache = key; // cache so user doesn't need to retype the passphrase straight away
+      } catch (e) {
+        setApiStatus("Encryption failed: " + e.message, "error");
+        return;
+      }
+    } else if (key && !wantsEncryption) {
+      newSettings.apiKey = key;
+      newSettings.encryptedKey = null;
+      decryptedApiKeyCache = key;
+    } else if (!key && apiSettings.encryptedKey && !wantsEncryption) {
+      // User unchecked encryption with a previously-encrypted key in place — require re-entry
+      setApiStatus("Paste the API key again to switch to unencrypted storage", "error");
+      return;
+    }
+    // If key blank and not changing anything else, keep existing state
+  }
+
+  apiSettings = newSettings;
+  persistApiSettings(apiSettings);
+  setApiStatus("Saved", "success");
+  updateAutoGradeButtonState();
+}
+
+function clearApiSettings() {
+  if (!confirm("Clear all AI grading settings from this browser? You'll need to re-enter them to auto-grade.")) return;
+  apiSettings = {
+    mode: apiSettings.mode,
+    model: apiSettings.model || DEFAULT_MODEL,
+    apiKey: "", encryptedKey: null,
+    proxyUrl: "", proxyPassword: "",
+  };
+  decryptedApiKeyCache = null;
+  persistApiSettings(apiSettings);
+  renderSettings();
+  setApiStatus("Cleared", "pending");
+  updateAutoGradeButtonState();
+}
+
+function setApiStatus(text, kind) {
+  const el = document.getElementById("api-status");
+  if (!el) return;
+  el.textContent = text;
+  el.className = kind || "";
+}
+
+async function callClaude(model, prompt) {
+  const requestBody = {
+    model,
+    max_tokens: 2048,
+    messages: [{ role: "user", content: prompt }],
+  };
+
+  let url, headers;
+  if (apiSettings.mode === "proxy") {
+    if (!apiSettings.proxyUrl) throw new Error("No proxy URL configured");
+    url = apiSettings.proxyUrl.replace(/\/+$/, "");
+    headers = { "Content-Type": "application/json" };
+    if (apiSettings.proxyPassword) headers["x-shared-password"] = apiSettings.proxyPassword;
+  } else {
+    const key = await resolveApiKey();
+    url = "https://api.anthropic.com/v1/messages";
+    headers = {
+      "Content-Type": "application/json",
+      "x-api-key": key,
+      "anthropic-version": "2023-06-01",
+      "anthropic-dangerous-direct-browser-access": "true",
+    };
+  }
+
+  let res;
+  try {
+    res = await fetch(url, { method: "POST", headers, body: JSON.stringify(requestBody) });
+  } catch (e) {
+    throw new Error("Network error: " + e.message + " (CORS? Check proxy URL or try serving over http://localhost)");
+  }
+  if (!res.ok) {
+    let detail = "";
+    try { const j = await res.json(); detail = j.error?.message || j.error || JSON.stringify(j); }
+    catch (e) { detail = await res.text(); }
+    throw new Error(`HTTP ${res.status} — ${String(detail).slice(0, 200)}`);
+  }
+  const data = await res.json();
+  const block = (data.content || []).find(b => b.type === "text");
+  if (!block) throw new Error("No text content in response");
+  return block.text;
+}
+
+async function testApiConnection() {
+  const model = document.getElementById("api-model").value;
+  // For testing, use the values currently in the fields (not yet saved) so the user can validate before save
+  const stagedSettings = { ...apiSettings, model };
+  if (apiSettings.mode === "proxy") {
+    stagedSettings.proxyUrl = document.getElementById("proxy-url").value.trim();
+    stagedSettings.proxyPassword = document.getElementById("proxy-password").value;
+    if (!stagedSettings.proxyUrl) { setApiStatus("Enter a proxy URL first", "error"); return; }
+  } else {
+    const key = document.getElementById("api-key").value.trim();
+    if (key) {
+      stagedSettings.apiKey = key;
+      stagedSettings.encryptedKey = null;
+      decryptedApiKeyCache = key;
+    } else if (!apiSettings.apiKey && !apiSettings.encryptedKey) {
+      setApiStatus("Enter a key first", "error"); return;
+    }
+  }
+
+  // Swap to staged settings just for the test
+  const saved = apiSettings;
+  apiSettings = stagedSettings;
+  setApiStatus("Testing…", "pending");
+  try {
+    const text = await callClaude(stagedSettings.model, "Reply with exactly the word: ok");
+    if (text.toLowerCase().includes("ok")) {
+      setApiStatus("Connected ✓", "success");
+    } else {
+      setApiStatus("Reached the API but got an unexpected reply", "error");
+    }
+  } catch (e) {
+    setApiStatus("Failed: " + e.message, "error");
+  } finally {
+    apiSettings = saved;
+  }
+}
+
+async function autoGrade() {
+  if (!isApiConfigured()) {
+    if (confirm("AI grading isn't configured yet. Open Settings to set it up?")) switchTab("settings");
+    return;
+  }
+  const result = buildPrompt();
+  if (result.error) { alert(result.error); return; }
+  const btn = document.getElementById("autograde-btn");
+  const originalLabel = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = "Grading…";
+  try {
+    const text = await callClaude(apiSettings.model, result.prompt);
+    document.getElementById("ai-response").value = text;
+    parseResponse();
+  } catch (e) {
+    alert("Auto-grade failed: " + e.message + "\n\nYou can fall back to the manual workflow below.");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = originalLabel;
+  }
+}
+
+function isApiConfigured() {
+  if (apiSettings.mode === "proxy") return !!apiSettings.proxyUrl;
+  return !!(apiSettings.apiKey || apiSettings.encryptedKey);
+}
+
+function updateAutoGradeButtonState() {
+  const btn = document.getElementById("autograde-btn");
+  const hint = document.getElementById("autograde-hint");
+  if (!btn) return;
+  btn.disabled = false; // always clickable so we can guide users to settings
+  if (isApiConfigured()) {
+    const modeLabel = apiSettings.mode === "proxy" ? "via proxy" : "direct";
+    hint.textContent = `${modeLabel} · ${apiSettings.model}`;
+  } else {
+    hint.textContent = "configure in Settings";
+  }
+}
+
+/* ============================================================
+   SAVE / LOAD / EXPORT
+   ============================================================ */
+function gatherExperiment() {
+  const versions = {};
+  for (const v of VERSIONS) {
+    versions[v] = {
+      author: document.querySelector(`.author-input[data-version="${v}"]`).value.trim(),
+      content: getVersionContent(v),
+    };
+  }
+  const weightedTotals = Object.fromEntries(VERSIONS.map(v => [v, computeTotal(v)]));
+  const rawTotals = Object.fromEntries(VERSIONS.map(v => [v, computeRawTotal(v)]));
+  return {
+    id: currentExperimentId || ("exp_" + Date.now()),
+    createdAt: new Date().toISOString(),
+    title: document.getElementById("exp-title").value.trim() || "Untitled experiment",
+    type: document.getElementById("exp-type").value.trim(),
+    brief: document.getElementById("exp-brief").value.trim(),
+    audience: document.getElementById("exp-audience").value.trim(),
+    versions,
+    scores: JSON.parse(JSON.stringify(currentScores)),
+    aiResponseRaw: document.getElementById("ai-response").value.trim(),
+    notes: document.getElementById("exp-notes").value.trim(),
+    weights: { ...currentWeights },
+    totals: weightedTotals,
+    rawTotals,
+    winner: pickWinner(weightedTotals),
+  };
+}
+
+function loadAllExperiments() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+  } catch (e) {
+    return [];
+  }
+}
+
+function saveAllExperiments(arr) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+  updateHistoryCount();
+}
+
+function saveExperiment() {
+  const exp = gatherExperiment();
+  if (!exp.versions.human.content && !exp.versions.ai.content && !exp.versions.hybrid.content) {
+    alert("Add some content before saving.");
+    return;
+  }
+  const all = loadAllExperiments();
+  const existingIdx = all.findIndex(e => e.id === exp.id);
+  if (existingIdx >= 0) {
+    all[existingIdx] = exp;
+  } else {
+    all.unshift(exp);
+  }
+  saveAllExperiments(all);
+  currentExperimentId = exp.id;
+  showFeedback("save-feedback");
+}
+
+function loadExperimentIntoForm(id) {
+  const all = loadAllExperiments();
+  const exp = all.find(e => e.id === id);
+  if (!exp) return;
+  currentExperimentId = exp.id;
+  document.getElementById("exp-title").value = exp.title || "";
+  document.getElementById("exp-type").value = exp.type || "";
+  document.getElementById("exp-brief").value = exp.brief || "";
+  document.getElementById("exp-audience").value = exp.audience || "";
+  document.getElementById("exp-notes").value = exp.notes || "";
+  document.getElementById("ai-response").value = exp.aiResponseRaw || "";
+  for (const v of VERSIONS) {
+    document.querySelector(`.author-input[data-version="${v}"]`).value = exp.versions[v]?.author || "";
+    const contentEl = document.querySelector(`.content-input[data-version="${v}"]`);
+    contentEl.value = exp.versions[v]?.content || "";
+    autoSizeTextarea(contentEl);
+  }
+  currentScores = migrateScores(exp.scores ? JSON.parse(JSON.stringify(exp.scores)) : blankScores());
+  renderScoresTable();
+  switchTab("new");
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function deleteExperiment(id) {
+  if (!confirm("Delete this experiment? This can't be undone.")) return;
+  const all = loadAllExperiments().filter(e => e.id !== id);
+  saveAllExperiments(all);
+  if (currentExperimentId === id) currentExperimentId = null;
+  renderHistory();
+}
+
+function clearAllExperiments() {
+  if (!confirm("Delete ALL saved experiments? This can't be undone. Consider exporting a backup first.")) return;
+  saveAllExperiments([]);
+  renderHistory();
+}
+
+function resetForm() {
+  if (!confirm("Clear the form? Unsaved changes will be lost.")) return;
+  document.querySelectorAll("input[type=text], textarea").forEach(el => el.value = "");
+  currentScores = blankScores();
+  currentExperimentId = null;
+  renderScoresTable();
+}
+
+/* ============================================================
+   JSONL EXPORT
+   ============================================================ */
+function experimentToJsonlLine(exp) {
+  const winner = exp.winner;
+  if (!winner) return null;
+  const winningContent = exp.versions[winner]?.content;
+  if (!winningContent) return null;
+  const scoresSrc = migrateScores(JSON.parse(JSON.stringify(exp.scores || {})))[winner];
+  const expWeights = exp.weights || DEFAULT_WEIGHTS;
+  const scores = {
+    ...Object.fromEntries(CRITERIA.map(c => [c, scoresSrc[c].score])),
+    weightedTotal: exp.totals[winner],
+    rawTotal: exp.rawTotals ? exp.rawTotals[winner] : null,
+  };
+  const rationale = Object.fromEntries(CRITERIA.map(c => [c, scoresSrc[c].rationale]));
+  const record = {
+    prompt: exp.brief,
+    completion: winningContent,
+    source: winner,
+    scores,
+    rationale,
+    weights: expWeights,
+    metadata: {
+      experimentId: exp.id,
+      title: exp.title,
+      type: exp.type,
+      audience: exp.audience,
+      author: exp.versions[winner].author,
+      createdAt: exp.createdAt,
+    },
+  };
+  return JSON.stringify(record);
+}
+
+function exportWinnerJsonl() {
+  const exp = gatherExperiment();
+  if (!exp.winner) {
+    alert("No winner yet — finish scoring first.");
+    return;
+  }
+  const line = experimentToJsonlLine(exp);
+  if (!line) { alert("Could not build export — check the winning version has content."); return; }
+  downloadFile(line + "\n", safeFilename(exp.title) + ".jsonl", "application/x-ndjson");
+}
+
+function exportAllJsonl() {
+  const all = loadAllExperiments();
+  const lines = all.map(experimentToJsonlLine).filter(Boolean);
+  if (lines.length === 0) { alert("No completed experiments to export."); return; }
+  downloadFile(lines.join("\n") + "\n", "content-grader-winners-" + dateStamp() + ".jsonl", "application/x-ndjson");
+}
+
+function exportAllJson() {
+  const all = loadAllExperiments();
+  if (all.length === 0) { alert("Nothing to back up."); return; }
+  const payload = { exportedAt: new Date().toISOString(), experiments: all };
+  downloadFile(JSON.stringify(payload, null, 2), "content-grader-backup-" + dateStamp() + ".json", "application/json");
+}
+
+function downloadFile(content, filename, mime) {
+  const blob = new Blob([content], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function safeFilename(s) {
+  return (s || "experiment").replace(/[^a-z0-9\-_]+/gi, "-").replace(/^-+|-+$/g, "").slice(0, 60).toLowerCase() || "experiment";
+}
+
+function dateStamp() {
+  const d = new Date();
+  return d.toISOString().slice(0, 10);
+}
+
+/* ============================================================
+   HISTORY VIEW
+   ============================================================ */
+function renderHistory() {
+  const all = loadAllExperiments();
+  const list = document.getElementById("history-list");
+  list.innerHTML = "";
+  if (all.length === 0) {
+    list.innerHTML = '<div class="empty-state"><div class="icon">○</div><div>No saved experiments yet.</div></div>';
+    return;
+  }
+  for (const exp of all) {
+    const winner = exp.winner;
+    const total = winner ? exp.totals[winner] : null;
+    const expWeights = exp.weights || DEFAULT_WEIGHTS;
+    const expMax = CRITERIA.reduce((acc, c) => acc + 5 * (expWeights[c] ?? 1), 0);
+    const item = document.createElement("div");
+    item.className = "history-item";
+    item.innerHTML = `
+      <div>
+        <div><strong>${escapeHtml(exp.title)}</strong>
+          ${winner ? `<span class="winner-pill ${winner}">${winner} · ${formatNum(total)}/${formatNum(expMax)}</span>` : '<span style="color: var(--text-muted); font-size: 12px;">incomplete</span>'}
+        </div>
+        <div class="meta">${new Date(exp.createdAt).toLocaleString()} ${exp.type ? '· ' + escapeHtml(exp.type) : ''}</div>
+      </div>
+      <div style="display: flex; gap: 6px;">
+        <button class="btn btn-secondary" onclick="loadExperimentIntoForm('${exp.id}')">Open</button>
+        <button class="btn btn-danger" onclick="deleteExperiment('${exp.id}')">Delete</button>
+      </div>
+    `;
+    list.appendChild(item);
+  }
+}
+
+function updateHistoryCount() {
+  const n = loadAllExperiments().length;
+  document.getElementById("history-count").textContent = n > 0 ? "(" + n + ")" : "";
+}
+
+/* ============================================================
+   MODAL + FEEDBACK
+   ============================================================ */
+function showModal(title, body) {
+  document.getElementById("modal-title").textContent = title;
+  document.getElementById("modal-body").textContent = body;
+  document.getElementById("modal").classList.add("show");
+}
+
+function closeModal(e) {
+  if (e && e.target && !e.target.classList.contains("modal-overlay") && e.type !== "click") return;
+  document.getElementById("modal").classList.remove("show");
+}
+
+function showFeedback(id, text) {
+  const el = document.getElementById(id);
+  if (text) el.textContent = text;
+  el.classList.add("show");
+  setTimeout(() => el.classList.remove("show"), 1600);
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+document.addEventListener("DOMContentLoaded", () => {
+  renderScoresTable();
+  updateHistoryCount();
+  updateAutoGradeButtonState();
+});
+</script>
+</body>
+</html>
