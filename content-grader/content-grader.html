@@ -67,7 +67,7 @@
     color: var(--text); transition: border-color .15s, box-shadow .15s;
   }
   textarea { resize: vertical; min-height: 80px; font-family: var(--sans); line-height: 1.5; }
-  textarea.content-input { min-height: 180px; font-family: var(--mono); font-size: 13px; }
+  textarea.content-input { min-height: 150px; font-family: var(--mono); font-size: 13px; }
   input:focus, textarea:focus, select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
 
   .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
@@ -75,10 +75,25 @@
   .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
   @media (max-width: 700px) { .grid-2 { grid-template-columns: 1fr; } }
 
-  .version-card { border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px; background: var(--surface); }
+  .versions-stack { display: flex; flex-direction: column; gap: 14px; }
+  .version-card {
+    display: grid;
+    grid-template-columns: 30% 1fr;
+    gap: 24px;
+    padding: 16px 18px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+  }
+  .version-meta { display: flex; flex-direction: column; gap: 6px; }
+  .version-content { display: flex; flex-direction: column; gap: 6px; }
+  @media (max-width: 700px) {
+    .version-card { grid-template-columns: 1fr; gap: 12px; }
+  }
   .version-card .tag {
-    display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: 0.04em;
-    text-transform: uppercase; padding: 3px 8px; border-radius: 12px; margin-bottom: 10px;
+    display: inline-block; font-size: 11px; font-weight: 500; letter-spacing: 0.04em;
+    text-transform: uppercase; padding: 3px 8px; border-radius: 12px; align-self: flex-start;
+    margin-bottom: 4px;
   }
   .tag.human { background: #d3f9d8; color: var(--human); }
   .tag.ai { background: #d0ebff; color: var(--ai); }
@@ -310,27 +325,39 @@
     <div class="panel">
       <h2><span class="step-num">2</span>Paste the three versions</h2>
       <p class="help">Leave any version blank if you only want to compare two.</p>
-      <div class="grid-3">
+      <div class="versions-stack">
         <div class="version-card">
-          <span class="tag human">Human</span>
-          <label>Author <span class="hint">optional</span></label>
-          <input type="text" class="author-input" data-version="human" placeholder="e.g. Sam (marketing)" />
-          <label style="margin-top: 10px;">Content</label>
-          <textarea class="content-input" oninput="autoSizeTextarea(this)" data-version="human" placeholder="Paste the human-written version here…"></textarea>
+          <div class="version-meta">
+            <span class="tag human">Human</span>
+            <label>Author <span class="hint">optional</span></label>
+            <input type="text" class="author-input" data-version="human" placeholder="e.g. Sam (marketing)" />
+          </div>
+          <div class="version-content">
+            <label>Content</label>
+            <textarea class="content-input" oninput="autoSizeTextarea(this)" data-version="human" placeholder="Paste the human-written version here…"></textarea>
+          </div>
         </div>
         <div class="version-card">
-          <span class="tag ai">AI</span>
-          <label>Source <span class="hint">optional</span></label>
-          <input type="text" class="author-input" data-version="ai" placeholder="e.g. Claude Sonnet 4.6" />
-          <label style="margin-top: 10px;">Content</label>
-          <textarea class="content-input" oninput="autoSizeTextarea(this)" data-version="ai" placeholder="Paste the fully-AI-generated version here…"></textarea>
+          <div class="version-meta">
+            <span class="tag ai">AI</span>
+            <label>Source <span class="hint">optional</span></label>
+            <input type="text" class="author-input" data-version="ai" placeholder="e.g. Claude Sonnet 4.6" />
+          </div>
+          <div class="version-content">
+            <label>Content</label>
+            <textarea class="content-input" oninput="autoSizeTextarea(this)" data-version="ai" placeholder="Paste the fully-AI-generated version here…"></textarea>
+          </div>
         </div>
         <div class="version-card">
-          <span class="tag hybrid">Hybrid</span>
-          <label>Author + tool <span class="hint">optional</span></label>
-          <input type="text" class="author-input" data-version="hybrid" placeholder="e.g. Sam + Claude (edited draft)" />
-          <label style="margin-top: 10px;">Content</label>
-          <textarea class="content-input" oninput="autoSizeTextarea(this)" data-version="hybrid" placeholder="Paste the human-edited AI draft (or AI-assisted human draft)…"></textarea>
+          <div class="version-meta">
+            <span class="tag hybrid">Hybrid</span>
+            <label>Author + tool <span class="hint">optional</span></label>
+            <input type="text" class="author-input" data-version="hybrid" placeholder="e.g. Sam + Claude (edited draft)" />
+          </div>
+          <div class="version-content">
+            <label>Content</label>
+            <textarea class="content-input" oninput="autoSizeTextarea(this)" data-version="hybrid" placeholder="Paste the human-edited AI draft (or AI-assisted human draft)…"></textarea>
+          </div>
         </div>
       </div>
     </div>
